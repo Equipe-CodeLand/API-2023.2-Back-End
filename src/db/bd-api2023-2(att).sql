@@ -2,7 +2,7 @@ create database api_2023_2;
 
 use api_2023_2;
 
-## tabela usuario(incompletas pois para a entrega da 1ªsprint não é necessário senha ou outras coisas)
+-- tabela usuario(incompletas pois para a entrega da 1ªsprint não é necessário senha ou outras coisas)
 create table if not exists usuario(
 	user_id int primary key,
     user_nome varchar(80),
@@ -16,7 +16,7 @@ create table if not exists usuario(
 
 
 
-##tabela chamada, incompleta pois para a 1ª só é necessário um lugar para salvar o que for escrito
+--tabela chamada, incompleta pois para a 1ª só é necessário um lugar para salvar o que for escrito
 create table if not exists chamada(
 	cha_id int primary key,
     cha_tema varchar(55),
@@ -29,7 +29,7 @@ create table if not exists chamada(
 
 
 
-## Estas tabelas estão comentadas, pois serão desnecessárias para a 1ª sprint já que não terá nenhum sistema de login ou resposta das chamadas
+-- Estas tabelas estão comentadas, pois serão desnecessárias para a 1ª sprint já que não terá nenhum sistema de login ou resposta das chamadas
 
 /* ##Tabela endereço
 create table if not exists endereco(

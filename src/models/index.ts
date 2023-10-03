@@ -1,0 +1,1 @@
+/* arquivo base para exportar os modelos (arquivos ts com as classes e tudo relacionado ao back) de cada parte */
