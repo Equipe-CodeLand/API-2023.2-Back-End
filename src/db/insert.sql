@@ -1,0 +1,48 @@
+use api_2023_2;
+
+#Adicionando Status e Prioridades
+insert into stats(sta_nome) values ("Não Iniciada");
+insert into stats(sta_nome) values ("Em Andamento");
+insert into stats(sta_nome) values ("Cancelada");
+insert into stats(sta_nome) values ("Concluída");
+
+insert into prioridade(pri_nome) values ("Alta");
+insert into prioridade(pri_nome) values ("Média");
+insert into prioridade(pri_nome) values ("Baixa");
+
+#Inserts para testar o banco
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Felipe','123.456.789-01','felipe27092005@gmail.com','(12) 99999-9999');
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Letícia','643.927.027-10','leticiafatec37@gmail.com','(12) 98888-8888');
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Pedro','384.420.740-11','pedrohenrique@gmail.com','(12) 93657-0275');
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Iago','123.456.549-01','iago@gmail.com','(12) 99347-9486');
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Caio','643.949.457-10','caio@gmail.com','(12) 98778-8878');
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Luiz','384.460.773-11','luiz@gmail.com','(12) 93655-0655');
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Laura','204.829.753-18','eulauragabriel@gmail.com','(12) 98643-9753');
+insert into usuario(user_nome,user_cpf,user_email,user_telefone) values ('Livia','493.954.497-15','livia.faria01@fatec.sp.gov.br','(12) 97618-4682');
+
+insert into administrador(user_id) values (1);
+insert into administrador(user_id) values (2);
+insert into administrador(user_id) values (3);
+
+insert into atendente(user_id, ate_turno) values (4,'Matiturno');
+insert into atendente(user_id, ate_turno) values (5,'Integral');
+insert into atendente(user_id, ate_turno) values (6,'Vespertino');
+
+insert into cliente(user_id) values (7);
+insert into cliente(user_id) values (8);
+
+insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id, pri_id) values ("Velocidade da Internet",
+ "Minha internet anda muito lenta esses dias, não consigo trabalhar",
+ now(),1,1,3);
+ 
+insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id, pri_id) values ("Modem",
+ "Meu modem está com uma das luses piscando e faz um barulho como se tivesse uma peça solta dentro dele",
+ now(),2,1,3);
+
+insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id, pri_id) values ("Sem acesso à Internet",
+ "Não estou conseguindo acessar a minha internet!",
+ now(),2,2,3);
+ 
+insert into atendente_chamada(ate_id,cha_id) values(2,3);
+
+
