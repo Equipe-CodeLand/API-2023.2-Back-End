@@ -5,7 +5,8 @@ use api_2023_2;
 ## tabela usuario(incompletas pois para a entrega da 1ªsprint não é necessário senha ou outras coisas)
 create table if not exists usuario(
 	user_id int primary key auto_increment,
-    user_nome varchar(80),
+    user_nome varchar(50),
+    user_sobrenome varchar(50),
     user_cpf varchar(15),
     user_email varchar(30),
     user_telefone varchar(15)
