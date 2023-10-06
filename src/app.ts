@@ -1,12 +1,18 @@
 import express from 'express';
-const db = require("./config/database.ts");
-
+import index from './routes/index';
+const db = require("./config/database.js");
 
 const app = express();
 const port = 5000;
-db.connect()
-db.init()
+
+db.connect(function(err){
+    if (err) throw err;
+    console.log('Conexão realizada com sucesso');
+    db.init(); // Chama a função init após a conexão ser estabelecida
+});
+
+app.use('/chamados', index); 
 
 app.listen(port, () => {
-return console.log(`Express server is listening at http://localhost:${port}`);
+    console.log(`Express server is listening at http://localhost:${port}`);
 });

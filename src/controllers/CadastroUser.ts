@@ -1,8 +1,6 @@
-import { connect } from "../config/database";
-
 export async function arquivarCadastro(nome:string, sobrenome:string, cpf:string,
     email:string,tipo:string,telefone:string,turno?:string) {
-    let con = await connect()
+    let con = await conn()
     var sql = "Insert into usuario(user_nome, user_sobrenome, user_cpf, user_email, user_telefone) values (?,?,?,?,?)"
     con.query(sql, [nome,sobrenome,cpf,email,telefone])
     switch (tipo) {
