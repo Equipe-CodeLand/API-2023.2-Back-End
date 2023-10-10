@@ -8,7 +8,7 @@ create table if not exists usuario(
     user_nome varchar(50),
     user_sobrenome varchar(50),
     user_cpf varchar(15),
-    user_email varchar(30),
+    user_email varchar(50),
     user_telefone varchar(15)
     #,user_senha varchar(20)
 );
