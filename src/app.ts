@@ -1,6 +1,7 @@
 import express, { json } from 'express';
 import index from './routes/index';
 import { arquivarCadastro } from './controllers/CadastroUser';
+import { pegarChamado } from './controllers/chamadosAten';
 const db = require("./config/database.js");
 const cors = require('cors')
 
@@ -9,15 +10,17 @@ const port = 5000;
 
 app.use(cors())
 app.use(json())
-/* db.connect(function(err){
-    if (err) throw err;
-    console.log('Conexão realizada com sucesso');
-    db.init(); // Chama a função init após a conexão ser estabelecida
-}); */
 
-app.get('/',(re,res)=>{
+app.get('/',(req,res)=>{
     return res.json('Back-End')
 })
+
+app.get('/ChamadosAtendente',(req,res)=>{
+    pegarChamado()
+    .then(resultado=>{
+        res.send(resultado)
+    })
+});
 
 app.post('/cadastroUser', (req, res) => {
     console.log(req.body);

@@ -2,7 +2,7 @@ create database if not exists api_2023_2;
 
 use api_2023_2;
 
-## tabela usuario(incompletas pois para a entrega da 1ªsprint não é necessário senha ou outras coisas)
+-- tabela usuario(incompletas pois para a entrega da 1ªsprint não é necessário senha ou outras coisas)
 create table if not exists usuario(
 	user_id int primary key auto_increment,
     user_nome varchar(50),
@@ -10,7 +10,7 @@ create table if not exists usuario(
     user_cpf varchar(15),
     user_email varchar(50),
     user_telefone varchar(15)
-    #,user_senha varchar(20)
+    -- user_senha varchar(20)
 );
 
 create table if not exists stats(
@@ -25,7 +25,7 @@ create table if not exists prioridade(
     primary key (pri_id)
 );
 
-##tabela cliente, dependente da tabela usuario
+-- tabela cliente, dependente da tabela usuario
 create table if not exists cliente(
 	cli_id int primary key auto_increment,
     /*cli_cep varchar(9),
@@ -54,9 +54,9 @@ create table if not exists chamada(
 
 
 
-## Estas tabelas estão comentadas, pois serão desnecessárias para a 1ª sprint já que não terá nenhum sistema de login ou resposta das chamadas
+-- Estas tabelas estão comentadas, pois serão desnecessárias para a 1ª sprint já que não terá nenhum sistema de login ou resposta das chamadas
 
-##Tabela endereço
+-- Tabela endereço
 create table if not exists endereco(
 	end_cep varchar(9) primary key,
     end_bairro varchar(30),
@@ -65,7 +65,7 @@ create table if not exists endereco(
     end_estado varchar(2)
 );
 
-##tabela funcionario, dependente da tabela usuario
+-- tabela funcionario, dependente da tabela usuario
 create table if not exists atendente(
 	ate_id int primary key auto_increment,
 	ate_turno varchar(15),
@@ -73,7 +73,7 @@ create table if not exists atendente(
 		foreign key (user_id) references usuario(user_id)
 );
 
-##table adm, dependente da tabela usuario
+-- table adm, dependente da tabela usuario
 create table if not exists administrador(
 	adm_id int auto_increment,
 	user_id int unique, 
@@ -81,7 +81,7 @@ create table if not exists administrador(
 	foreign key (user_id) references usuario(user_id)
 );
 
-## relacionamento de muitos para muitos, ou seja vários funcionários podem atender à diferentes ou a mesma chamada
+-- relacionamento de muitos para muitos, ou seja vários funcionários podem atender à diferentes ou a mesma chamada
 create table if not exists atendente_chamada(
 	ate_id int,
 		foreign key (ate_id) references atendente(ate_id),
