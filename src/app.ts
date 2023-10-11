@@ -1,8 +1,8 @@
 import express, { json } from 'express';
 import index from './routes/index';
 import { arquivarCadastro } from './controllers/CadastroUser';
-import { pegarChamado } from './controllers/chamadosAten';
-const db = require("./config/database.js");
+import { pegarChamado, buscarChamadosPorAtendente } from './controllers/chamadosAten';
+const db = require("./config/database.ts");
 const cors = require('cors')
 
 const app = express();
@@ -21,6 +21,13 @@ app.get('/ChamadosAtendente',(req,res)=>{
         res.send(resultado)
     })
 });
+
+app.get('/atendenteChamados/:id', (req, res) => {
+    buscarChamadosPorAtendente(req.params.id)
+    .then(result => {
+        return res.send(result)
+    }) 
+})
 
 app.post('/cadastroUser', (req, res) => {
     console.log(req.body);

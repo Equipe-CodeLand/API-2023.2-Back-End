@@ -1,4 +1,4 @@
-const db = require("../config/database.js");
+const db = require("../config/database.ts");
 
 export async function arquivarCadastro(nome, sobrenome, cpf, email, tipo, telefone, turno) {
     try {
