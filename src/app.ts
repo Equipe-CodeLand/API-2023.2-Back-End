@@ -3,11 +3,15 @@ import index from './routes/index';
 import { arquivarCadastro } from './controllers/CadastroUser';
 import { pegarChamado } from './controllers/chamadosAten';
 import { arquivarCadastroCli } from './controllers/cadastroCliente';
-const db = require("./config/database.js");
+
+const db = require("./config/database.ts");
 const cors = require('cors')
+const bodyParser = require('body-parser');
 
 const app = express();
-const port = 5000;
+const PORT = process.env.PORT || 5000;
+
+app.use(bodyParser.json());
 
 app.use(cors())
 app.use(json())
@@ -23,10 +27,10 @@ app.get('/ChamadosAtendente',(req,res)=>{
     })
 });
 
-app.post('/cadastroCli', (req, res) => {
+
+app.post('/cadastro/cliente', (req, res) => {
     console.log(req.body);
-    arquivarCadastroCli(req.body.nome,req.body.sobrenome,req.body.cpf,req.body.email,req.body.telefone,req.body.tema,req.body.mensagem,
-    );
+    arquivarCadastroCli(req.body.nome,req.body.sobrenome,req.body.cpf,req.body.email,req.body.telefone,req.body.tema,req.body.mensagem,req.body.res);
   });
 
 app.post('/cadastroUser', (req, res) => {
@@ -46,6 +50,6 @@ app.post('/cadastroUser', (req, res) => {
         return res.json(data);
     });
 });*/
-app.listen(port, () => {
-    console.log(`Express server is listening at http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Express server is listening at http://localhost:${PORT}`);
 });

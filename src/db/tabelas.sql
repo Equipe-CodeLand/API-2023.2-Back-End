@@ -51,9 +51,6 @@ create table if not exists chamada(
 	foreign key (cli_id) references cliente(cli_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
-
-
 -- Estas tabelas estão comentadas, pois serão desnecessárias para a 1ª sprint já que não terá nenhum sistema de login ou resposta das chamadas
 
 -- Tabela endereço
@@ -100,4 +97,3 @@ create table if not exists resposta(
 	cha_id int,
 		foreign key (cha_id) references chamada(cha_id)
 );
-

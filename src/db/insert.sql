@@ -45,4 +45,3 @@ insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id, pri_id) values 
  
 insert into atendente_chamada(ate_id,cha_id) values(2,3);
 
-
