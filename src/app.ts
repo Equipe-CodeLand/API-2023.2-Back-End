@@ -1,8 +1,9 @@
 import express, { json } from 'express';
 import index from './routes/index';
 import { arquivarCadastro } from './controllers/CadastroUser';
-import { pegarChamado, buscarChamadosPorAtendente } from './controllers/chamadosAten';
-const db = require("./config/database.ts");
+import { pegarChamado } from './controllers/chamadosAten';
+import { arquivarCadastroCli } from './controllers/cadastroCliente';
+const db = require("./config/database.js");
 const cors = require('cors')
 
 const app = express();
@@ -22,12 +23,11 @@ app.get('/ChamadosAtendente',(req,res)=>{
     })
 });
 
-app.get('/atendenteChamados/:id', (req, res) => {
-    buscarChamadosPorAtendente(req.params.id)
-    .then(result => {
-        return res.send(result)
-    }) 
-})
+app.post('/cadastroCli', (req, res) => {
+    console.log(req.body);
+    arquivarCadastroCli(req.body.nome,req.body.sobrenome,req.body.cpf,req.body.email,req.body.telefone,req.body.tema,req.body.mensagem,
+    );
+  });
 
 app.post('/cadastroUser', (req, res) => {
     console.log(req.body);
