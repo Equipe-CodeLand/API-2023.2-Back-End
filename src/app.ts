@@ -1,8 +1,13 @@
 import express, { json } from 'express';
 import index from './routes/index';
+import "reflect-metadata";
+import { AppDataSource } from "./config/data-source";
 import { arquivarCadastro } from './controllers/CadastroUser';
 import { pegarChamado } from './controllers/chamadosAten';
 import { arquivarCadastroCli } from './controllers/cadastroCliente';
+import { buscarUsuario, criarUsuario } from './services/usuario.service';
+import Usuario from './entities/usuario.entity';
+
 
 const db = require("./config/database.ts");
 const cors = require('cors')
@@ -12,6 +17,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
+
+AppDataSource
+    .initialize()
+    .then(() => {
+        console.log("Data Source has been initialized!")
+        
+        buscarUsuario(1).then(usuario => console.log(usuario))
+        
+        criarUsuario(new Usuario('nome', 'sobrenome', '455.558.687-12', 'teste@email.com', '129845548')).then(usuario => {
+            console.log(usuario)
+        })
+    })
+    .catch((err) => {
+        console.error("Error during Data Source initialization:", err)
+    })
 
 app.use(cors())
 app.use(json())

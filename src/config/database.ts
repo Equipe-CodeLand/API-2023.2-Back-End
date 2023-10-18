@@ -1,12 +1,12 @@
 var mysql = require('mysql2');
 
-var conn = mysql.createConnection({
+/* var conn = mysql.createConnection({
     host:'localhost',
     user: 'root',
     password: 'fatec23',
     database: 'api_2023_2',
     multipleStatements: true
-});
+}); */
 
 function init() {
     // Inicializações após a conexão ser estabelecida
@@ -15,6 +15,6 @@ function init() {
 }
 
 module.exports = {
-    connect: conn, 
+    // connect: conn, 
     init: init
 };
