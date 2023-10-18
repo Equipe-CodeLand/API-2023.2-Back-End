@@ -3,11 +3,11 @@ import Usuario from "../entities/usuario.entity";
 
 const usuarioRepository = AppDataSource.getRepository(Usuario)
 
+
 export async function buscarUsuario(id: number) {
-    const usuario = await usuarioRepository.findOneBy({id: id})
-    return usuario
+    return await usuarioRepository.findOneBy({id: id})
 }
 
-export async function criarUsuario(usuario: Usuario) {
+export async function cadastrarUsuario(usuario: Usuario) {
     return await usuarioRepository.save(usuario)
 }

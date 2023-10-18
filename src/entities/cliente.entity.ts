@@ -8,7 +8,7 @@ export default class Cliente {
     @PrimaryGeneratedColumn({name: 'cli_id'})
     public id: number
 
-    @OneToOne(() => Usuario)
+    @OneToOne(() => Usuario, {eager: true})
     @JoinColumn({name: 'user_id'})
     public usuario: Usuario
 

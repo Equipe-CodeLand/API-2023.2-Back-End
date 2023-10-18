@@ -11,7 +11,7 @@ export default class Atendente {
     @Column({name:'ate_turno', length: 15})
     public turno: string
 
-    @OneToOne(() => Usuario)
+    @OneToOne(() => Usuario, {eager: true})
     @JoinColumn({name: 'user_id'})
     public usuario: Usuario
 

@@ -5,8 +5,8 @@ import { AppDataSource } from "./config/data-source";
 import { arquivarCadastro } from './controllers/CadastroUser';
 import { pegarChamado } from './controllers/chamadosAten';
 import { arquivarCadastroCli } from './controllers/cadastroCliente';
-import { buscarUsuario, criarUsuario } from './services/usuario.service';
-import Usuario from './entities/usuario.entity';
+import { buscarUsuario, cadastrarUsuario } from './services/usuario.service';
+import { criarChamado } from './services/chamado.service';
 
 
 const db = require("./config/database.ts");
@@ -23,11 +23,20 @@ AppDataSource
     .then(() => {
         console.log("Data Source has been initialized!")
         
-        buscarUsuario(1).then(usuario => console.log(usuario))
+        // buscarUsuario(1).then(usuario => console.log(usuario))
         
-        criarUsuario(new Usuario('nome', 'sobrenome', '455.558.687-12', 'teste@email.com', '129845548')).then(usuario => {
+        /* cadastrarUsuario(new Usuario('nome', 'sobrenome', '455.558.687-12', 'teste@email.com', '129845548')).then(usuario => {
             console.log(usuario)
-        })
+        }) */
+        /* cadastrarCliente(1).then(cliente => {
+            console.log(cliente)
+        }) */
+        /* criarCliente(new Usuario('nome 2', 'sobrenome 2', '455.558.687-12', 'teste@email.com', '129845548')).then(usuario => {
+            console.log(usuario)
+        }) */
+        /* criarChamado(6, 'internet lenta', 'minha internet ta lenta').then(chamado => {
+            console.log(chamado)
+        }) */
     })
     .catch((err) => {
         console.error("Error during Data Source initialization:", err)

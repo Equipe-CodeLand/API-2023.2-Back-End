@@ -7,7 +7,7 @@ export default class Administrador {
     @PrimaryGeneratedColumn({name:'adm_id'})
     public id: number
 
-    @OneToOne(() => Usuario)
+    @OneToOne(() => Usuario, {eager: true})
     @JoinColumn({name: 'user_id'})
     public usuario: Usuario
 
