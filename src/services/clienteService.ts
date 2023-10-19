@@ -1,20 +1,20 @@
 import { AppDataSource } from "../config/data-source";
 import Cliente from "../entities/cliente.entity";
 import Usuario from "../entities/usuario.entity";
-import { buscarUsuario, cadastrarUsuario } from "./usuario.service";
+import { buscarUsuario, cadastrarUsuario } from "./usuarioService";
 
 const clienteRepository = AppDataSource.getRepository(Cliente)
 
 export async function buscarCliente(id: number) {
-    return await clienteRepository.findOneBy({id: id})
+    return clienteRepository.findOneBy({id: id})
 }
 
 export async function criarCliente(usuario: Usuario) {
     const usuarioCriado = await cadastrarUsuario(usuario)
-    return await clienteRepository.save(new Cliente(usuarioCriado))
+    return clienteRepository.save(new Cliente(usuarioCriado))
 }
 
 export async function cadastrarCliente(idUsuario: number) {
     const usuario = await buscarUsuario(idUsuario)
-    return await clienteRepository.save(new Cliente(usuario))
+    return clienteRepository.save(new Cliente(usuario))
 }

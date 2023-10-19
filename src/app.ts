@@ -5,8 +5,11 @@ import { AppDataSource } from "./config/data-source";
 import { arquivarCadastro } from './controllers/CadastroUser';
 import { pegarChamado } from './controllers/chamadosAten';
 import { arquivarCadastroCli } from './controllers/cadastroCliente';
-import { buscarUsuario, cadastrarUsuario } from './services/usuario.service';
-import { criarChamado } from './services/chamado.service';
+import { buscarUsuario, cadastrarUsuario } from './services/usuarioService';
+import { criarChamado } from './services/chamadoService';
+import Usuario from './entities/usuario.entity';
+import { enviarMensagem } from './services/mensagemService';
+import { buscarCliente } from './services/clienteService';
 
 
 const db = require("./config/database.ts");
@@ -22,6 +25,8 @@ AppDataSource
     .initialize()
     .then(() => {
         console.log("Data Source has been initialized!")
+
+        // enviarMensagem('udwgdywdwyu', 4, 5, 'Atendente')
         
         // buscarUsuario(1).then(usuario => console.log(usuario))
         
@@ -34,7 +39,7 @@ AppDataSource
         /* criarCliente(new Usuario('nome 2', 'sobrenome 2', '455.558.687-12', 'teste@email.com', '129845548')).then(usuario => {
             console.log(usuario)
         }) */
-        /* criarChamado(6, 'internet lenta', 'minha internet ta lenta').then(chamado => {
+        /* criarChamado(1, 'internet lenta', 'minha internet ta lenta').then(chamado => {
             console.log(chamado)
         }) */
     })

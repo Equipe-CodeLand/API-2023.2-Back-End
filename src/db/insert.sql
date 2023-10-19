@@ -6,10 +6,6 @@ insert into stats(sta_nome) values ("Em Andamento");
 insert into stats(sta_nome) values ("Cancelada");
 insert into stats(sta_nome) values ("Concluída");
 
-insert into prioridade(pri_nome) values ("Alta");
-insert into prioridade(pri_nome) values ("Média");
-insert into prioridade(pri_nome) values ("Baixa");
-
 #Inserts para testar o banco
 insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone) values ('Felipe','Vieira','123.456.789-01','felipe27092005@gmail.com','(12) 99999-9999');
 insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone) values ('Letícia','Helena','643.927.027-10','leticiafatec37@gmail.com','(12) 98888-8888');
@@ -31,17 +27,15 @@ insert into atendente(user_id, ate_turno) values (6,'Vespertino');
 insert into cliente(user_id) values (7);
 insert into cliente(user_id) values (8);
 
-insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id, pri_id) values ("Velocidade da Internet",
+insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id) values ("Velocidade da Internet",
  "Minha internet anda muito lenta esses dias, não consigo trabalhar",
- now(),1,1,3);
+ now(),1,1);
  
-insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id, pri_id) values ("Modem",
+insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id) values ("Modem",
  "Meu modem está com uma das luses piscando e faz um barulho como se tivesse uma peça solta dentro dele",
- now(),2,1,3);
+ now(),2,1);
 
-insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id, pri_id) values ("Sem acesso à Internet",
+insert into chamada(cha_tema,cha_desc,cha_inicio,cli_id, sta_id) values ("Sem acesso à Internet",
  "Não estou conseguindo acessar a minha internet!",
- now(),2,2,3);
- 
-insert into atendente_chamada(ate_id,cha_id) values(2,3);
+ now(),2,2);
 

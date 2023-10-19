@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
+import Mensagem from "./mensagem.entity"
 
 @Entity({name: 'usuario'})
 export default class Usuario {
@@ -21,8 +22,11 @@ export default class Usuario {
     @Column({ name: 'user_telefone', length: 15, nullable: false })
     public telefone: string
 
-    @Column({ name: 'user_senha', length: 20, nullable: true, select: false })
+    @Column({ name: 'user_senha', length: 20, nullable: true })
     public senha: string
+
+    @OneToMany(() => Mensagem, (mensagem) => mensagem.usuario)
+    public mensagens: Mensagem[]
 
     constructor(nome: string, sobrenome: string, cpf: string, email: string, telefone: string) {
         this.nome = nome

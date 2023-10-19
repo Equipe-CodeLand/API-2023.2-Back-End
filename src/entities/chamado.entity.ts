@@ -1,9 +1,10 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import Cliente from "./cliente.entity";
 import Status from "./status.entity";
 import Atendente from "./atendente.entity";
+import Mensagem from "./mensagem.entity";
 
-@Entity({name: 'chamado'})
+@Entity({name: 'chamada'})
 export default class Chamado {
     
     @PrimaryGeneratedColumn({name: 'cha_id'})
@@ -32,6 +33,9 @@ export default class Chamado {
     @ManyToOne(() => Atendente, (atendente) => atendente.chamados)
     @JoinColumn({name: 'ate_id'})
     public atendente: Atendente
+
+    @OneToMany(() => Mensagem, (mensagem) => mensagem.chamado)
+    public mensagens: Mensagem[];
 
     constructor(tema: string, desc: string, cliente: Cliente, status: Status) {
         this.tema = tema
