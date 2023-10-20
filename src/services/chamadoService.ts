@@ -15,3 +15,12 @@ export async function criarChamado(idCliente: number, tema: string, desc: string
 export async function buscarChamado(id: number) {
     return chamadoRepository.findOneBy({id: id})
 }
+
+async function buscarTodosChamados() {
+    try {
+        const chamados = await buscarTodosChamados(); 
+        return chamados;
+    } catch (error) {
+        throw new Error(`Erro ao buscar chamados: ${error.message}`);
+    }
+}

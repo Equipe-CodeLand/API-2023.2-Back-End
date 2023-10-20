@@ -1,13 +1,13 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "esModuleInterop": true,
-      "target": "es2021",
-      "moduleResolution": "node",
-      "sourceMap": true,
-      "outDir": "dist",
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true
-    },
-    "lib": ["es2021"]
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es2021",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
+  "lib": ["es2021"]
 }

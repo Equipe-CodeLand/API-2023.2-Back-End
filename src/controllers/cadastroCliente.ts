@@ -1,4 +1,4 @@
-const db = require('../config/database')
+/*const db = require('../config/database')
 
 export async function arquivarCadastroCli(nome, sobrenome, cpf, email, telefone, tema, mensagem, res) {
     try {
@@ -18,3 +18,4 @@ export async function arquivarCadastroCli(nome, sobrenome, cpf, email, telefone,
         console.error(error);
     }
 }
+*/
