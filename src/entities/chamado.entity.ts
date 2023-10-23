@@ -22,7 +22,7 @@ export default class Chamado {
     @Column({name: 'cha_final', nullable: true})
     public final: Date
 
-    @ManyToOne(() => Cliente, (cliente) => cliente.chamados)
+    @ManyToOne(() => Cliente, (cliente) => cliente.chamados, {eager:true})
     @JoinColumn({name: 'cli_id'})
     public cliente: Cliente
 

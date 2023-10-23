@@ -1,108 +1,99 @@
 import "reflect-metadata";
 import { AppDataSource } from "./config/data-source";
-import { arquivarCadastro } from './controllers/CadastroUser';
-//import { arquivarCadastroCli } from './controllers/cadastroCliente';
-import { obterChamados } from './controllers/chamadosAdm';
 import { Request, Response } from 'express';
-import { buscarTodosChamados } from "./services/repositorioService";
-import { criarChamado } from "./services/chamadoService";
+import { buscarUsuario, cadastrarUsuario } from "./services/usuarioService";
+import Usuario from "./entities/usuario.entity";
+import { cadastrarCliente, criarCliente } from "./services/clienteService";
+import buscarChamadosComInformacoes, { criarChamado } from "./services/chamadoService";
+import buscarChamados from "./services/chamadoService";
 
-const express = require('express')
-
+const express = require('express');
 const app = express();
 
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 AppDataSource.initialize()
     .then(() => {
         console.log("Data Source has been initialized!");
+
+        app.use(cors());
         app.use(bodyParser.json());
-        
-        app.get('/adm/chamados', async (req: Request, res: any) => {
+
+        // Rota para verificar se o servidor está rodando
+        app.get('/', (req, res) => {
+            return res.json('Back-End');
+        });
+
+        // Rota para obter chamados (administrador)
+        app.post('/adm/chamados', async (req: Request, res: Response) => {
+            const clienteId = parseInt(req.params.idCliente);
             try {
-                const chamados = await buscarTodosChamados();
-                console.log(chamados);
-                res.send(chamados); // Envie a lista de chamados como resposta
+                const chamadosComInformacoes = await buscarChamadosComInformacoes();
+                res.json(chamadosComInformacoes);
             } catch (error) {
-                console.error(error.message);
-                res.status(500).send({ message: 'Erro ao obter os chamados' });
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao obter os chamados' });
             }
-        });                  
-        async function testarBuscarTodosChamados() {
+        });
+
+        // Rota para obter informações de um usuário
+        app.get('/usuarios/:id', async (req: Request, res: Response) => {
+            const usuarioId = parseInt(req.params.id);
             try {
-                const chamados = await buscarTodosChamados();
-                console.log(chamados); // Isso imprimirá a lista de chamados no console
+                const usuario = await buscarUsuario(usuarioId);
+                res.json(usuario);
             } catch (error) {
-                console.error(error.message);
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao buscar o usuário' });
             }
-        }
-        
-        // Chame a função de teste
-        testarBuscarTodosChamados();
-        
-        // buscarUsuario(1).then(usuario => console.log(usuario))
-        
-        /* cadastrarUsuario(new Usuario('nome', 'sobrenome', '455.558.687-12', 'teste@email.com', '129845548')).then(usuario => {
-            console.log(usuario)
-        }) */
-        /* cadastrarCliente(1).then(cliente => {
-            console.log(cliente)
-        }) */
-        /* criarCliente(new Usuario('nome 2', 'sobrenome 2', '455.558.687-12', 'teste@email.com', '129845548')).then(usuario => {
-            console.log(usuario)
-        }) */
-        criarChamado(6, 'internet lenta', 'minha internet ta lenta').then(chamado => {
-            console.log(chamado)
-        })
-        
+        });
+
+        // Rota para cadastrar um usuário
+        app.post('/usuarios', async (req: Request, res: Response) => {
+            const novoUsuario = req.body; // Certifique-se de enviar os dados corretos no corpo da requisição
+            try {
+                const usuario = await cadastrarUsuario(new Usuario(novoUsuario.nome, novoUsuario.sobrenome, novoUsuario.cpf, novoUsuario.email, novoUsuario.telefone));
+                res.json(usuario);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao cadastrar o usuário' });
+            }
+        });
+
+        // Rota para cadastrar um cliente
+        app.post('/clientes', async (req: Request, res: Response) => {
+            const clienteId = req.body.id; // Certifique-se de enviar o ID do cliente no corpo da requisição
+            try {
+                const cliente = await cadastrarCliente(clienteId);
+                res.json(cliente);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao cadastrar o cliente' });
+            }
+        });
+
+        // Rota para criar um chamado
+        // Rota para criar um chamado
+        app.post('/chamados', async (req: Request, res: Response) => {
+            const { idCliente, tema, desc } = req.body; // Certifique-se de enviar os dados corretos no corpo da requisição
+            try {
+                const chamado = await criarChamado(idCliente, tema, desc);
+                res.json(chamado);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao criar o chamado' });
+            }
+        });
+
+
+        const PORT = process.env.PORT || 5000;
+
+        app.listen(PORT, () => {
+            console.log(`Express server is listening at http://localhost:${PORT}`);
+        });
+
     })
     .catch((err) => {
         console.error("Error during Data Source initialization:", err)
-    })
-
-
-const bodyParser = require('body-parser');
-
-const PORT = process.env.PORT || 5000;
-
-app.use(cors());
-app.use(bodyParser.json());
-
-// Rota para verificar se o servidor está rodando
-app.get('/', (req, res) => {
-    return res.json('Back-End');
-});
-
-// Rota para obter chamados (administrador)
-/*app.get('/adm/chamados', async (req, res) => {
-    try {
-        const chamados = await obterChamados();
-        res.json(chamados);
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao obter os chamados' });
-    }
-});
-
-// Rota para pegar chamados (atendente)
-/*app.get('/ChamadosAtendente', (req, res) => {
-    pegarChamado()
-    .then(resultado => {
-        res.send(resultado)
-    })
-});*/
-
-// Rota para cadastrar cliente
-/*app.post('/cadastro/cliente', (req, res) => {
-    console.log(req.body);
-    arquivarCadastroCli(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.tema, req.body.mensagem, req.body.res);
-});
-
-// Rota para cadastrar usuário
-app.post('/cadastroUser', (req, res) => {
-    console.log(req.body);
-    arquivarCadastro(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.tipo, req.body.telefone, req.body.turno);
-});*/
-
-app.listen(PORT, () => {
-    console.log(`Express server is listening at http://localhost:${PORT}`);
-});
+    });

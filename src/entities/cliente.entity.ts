@@ -4,6 +4,9 @@ import Chamado from "./chamado.entity";
 
 @Entity({name: 'cliente'})
 export default class Cliente {
+    static findOne(idCliente: any) {
+        throw new Error("Method not implemented.");
+    }
 
     @PrimaryGeneratedColumn({name: 'cli_id'})
     public id: number

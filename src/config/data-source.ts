@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource, getConnection } from "typeorm";
 import Chamado from "../entities/chamado.entity"; // Importe a entidade Chamado
 
 export const AppDataSource = new DataSource({

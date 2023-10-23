@@ -3,6 +3,9 @@ import Chamado from "./chamado.entity";
 
 @Entity({name: 'stats'})
 export default class Status {
+    static findOne(arg0: number) {
+        throw new Error("Method not implemented.");
+    }
 
     @PrimaryGeneratedColumn({name: 'sta_id'})
     public id: number
