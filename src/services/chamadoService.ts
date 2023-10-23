@@ -62,7 +62,8 @@ async function buscarChamadosComInformacoes() {
                 }
             }},
         relations:{
-            cliente: {usuario: true}
+            cliente: {usuario: true},
+            status: true
         }
     })
         /*.innerJoinAndSelect('chamado.cliente', 'cliente')

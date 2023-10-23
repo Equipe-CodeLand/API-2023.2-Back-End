@@ -26,8 +26,7 @@ AppDataSource.initialize()
         });
 
         // Rota para obter chamados (administrador)
-        app.post('/adm/chamados', async (req: Request, res: Response) => {
-            const clienteId = parseInt(req.params.idCliente);
+        app.get('/adm/chamados', async (req: Request, res: Response) => {
             try {
                 const chamadosComInformacoes = await buscarChamadosComInformacoes();
                 res.json(chamadosComInformacoes);
