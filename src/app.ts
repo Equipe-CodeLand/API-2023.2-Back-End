@@ -6,6 +6,7 @@ import Usuario from "./entities/usuario.entity";
 import { cadastrarCliente, criarCliente } from "./services/clienteService";
 import buscarChamadosComInformacoes, { criarChamado } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
+import Chamado from "./entities/chamado.entity";
 
 const express = require('express');
 const app = express();
@@ -26,7 +27,7 @@ AppDataSource.initialize()
         });
 
         // Rota para obter chamados (administrador)
-        app.get('/adm/chamados', async (req: Request, res: Response) => {
+        app.get('/chamados', async (req: Request, res: Response) => {
             try {
                 const chamadosComInformacoes = await buscarChamadosComInformacoes();
                 res.json(chamadosComInformacoes);
@@ -73,8 +74,7 @@ AppDataSource.initialize()
         });
 
         // Rota para criar um chamado
-        // Rota para criar um chamado
-        app.post('/chamados', async (req: Request, res: Response) => {
+        app.post('/criarChamados', async (req: Request, res: Response) => {
             const { idCliente, tema, desc } = req.body; // Certifique-se de enviar os dados corretos no corpo da requisição
             try {
                 const chamado = await criarChamado(idCliente, tema, desc);
@@ -84,6 +84,7 @@ AppDataSource.initialize()
                 res.status(500).json({ message: 'Erro ao criar o chamado' });
             }
         });
+
 
 
         const PORT = process.env.PORT || 5000;

@@ -26,7 +26,7 @@ export default class Chamado {
     @JoinColumn({name: 'cli_id'})
     public cliente: Cliente
 
-    @ManyToOne(() => Status, (status) => status.chamados)
+    @ManyToOne(() => Status, (status) => status.chamados, {eager:true})
     @JoinColumn({name: 'sta_id'})
     public status: Status
 

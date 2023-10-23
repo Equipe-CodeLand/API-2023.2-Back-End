@@ -1,5 +1,6 @@
 import { DataSource, getConnection } from "typeorm";
 import Chamado from "../entities/chamado.entity"; // Importe a entidade Chamado
+import { criarChamado } from "../services/chamadoService";
 
 export const AppDataSource = new DataSource({
     type: "mysql",
