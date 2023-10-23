@@ -13,7 +13,7 @@ export default class Usuario {
     @Column({ name: 'user_sobrenome', length: 50, nullable: false })
     public sobrenome: string
 
-    @Column({ name: 'user_cpf', length: 15, nullable: false })
+    @Column({ name: 'user_cpf', length: 15, nullable: false , select: false})
     public cpf: string
 
     @Column({ name: 'user_email', length: 50, nullable: false })
@@ -22,7 +22,7 @@ export default class Usuario {
     @Column({ name: 'user_telefone', length: 15, nullable: false })
     public telefone: string
 
-    @Column({ name: 'user_senha', length: 20, nullable: true })
+    @Column({ name: 'user_senha', length: 20, nullable: true, select: false })
     public senha: string
 
     @OneToMany(() => Mensagem, (mensagem) => mensagem.usuario)
