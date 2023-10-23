@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { AppDataSource } from "./config/data-source";
 import { Request, Response } from 'express';
-import { buscarUsuario, cadastrarUsuario } from "./services/usuarioService";
+import { buscarUsuario, buscarUsuarioPorEmail, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { cadastrarCliente, criarCliente } from "./services/clienteService";
 import buscarChamadosComInformacoes, { criarChamado } from "./services/chamadoService";
@@ -57,6 +57,18 @@ AppDataSource.initialize()
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Erro ao cadastrar o usuário' });
+            }
+        });
+
+        // Rota para pegar o usuário pelo email
+        app.get('/login/:email', async (req: Request, res: Response) => {
+            const email = req.params.email;
+            try {
+                const usuario = await buscarUsuarioPorEmail(email);
+                res.json(usuario);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao buscar o usuário' });
             }
         });
 
