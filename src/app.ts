@@ -7,6 +7,7 @@ import { cadastrarCliente, criarCliente } from "./services/clienteService";
 import buscarChamadosComInformacoes, { criarChamado } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
+import { buscarMensagens } from "./services/mensagemService";
 
 const express = require('express');
 const app = express();
@@ -36,6 +37,16 @@ AppDataSource.initialize()
                 res.status(500).json({ message: 'Erro ao obter os chamados' });
             }
         });
+
+        app.get('/chamados/:id/mensagens', (req, res) => {
+            let idChamado = parseInt(req.params.id)
+            buscarMensagens(idChamado)
+                .then(mensagens => res.json(mensagens))
+                .catch(error => {
+                    console.error(error);
+                    res.status(500).json({ message: 'Erro ao buscar mensagens' });
+                })    
+        })
 
         // Rota para obter informações de um usuário
         app.get('/usuarios/:id', async (req: Request, res: Response) => {

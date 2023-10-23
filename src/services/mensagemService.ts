@@ -12,3 +12,12 @@ export async function enviarMensagem(texto: string, idChamado: number, idUsuario
 
     return mensagemRepository.save(new Mensagem(texto, chamado, usuario, tipoUsuario))
 }
+
+export async function buscarMensagens(idChamado: number) {
+    return mensagemRepository.find({
+        select: {id: true, texto: true,horaEnvio: true, tipoUsuario: true, usuario: {nome: true, sobrenome: true}},
+        relations: {usuario: true},
+        where: {chamado: {id: idChamado}},
+        order: {horaEnvio: 'ASC'}
+    })    
+}
