@@ -3,6 +3,7 @@ import Cliente from "./cliente.entity";
 import Status from "./status.entity";
 import Atendente from "./atendente.entity";
 import Mensagem from "./mensagem.entity";
+import Prioridade from "./prioridade.entity";
 
 @Entity({name: 'chamada'})
 export default class Chamado {
@@ -34,13 +35,18 @@ export default class Chamado {
     @JoinColumn({name: 'ate_id'})
     public atendente: Atendente
 
+    @ManyToOne(()=> Prioridade, (prioridade) => prioridade.chamados)
+    @JoinColumn({name: 'pri_id'})
+    public prioridade: Prioridade
+
     @OneToMany(() => Mensagem, (mensagem) => mensagem.chamado)
     public mensagens: Mensagem[];
 
-    constructor(tema: string, desc: string, cliente: Cliente, status: Status) {
+    constructor(tema: string, desc: string, cliente: Cliente, status: Status, prioridade: Prioridade) {
         this.tema = tema
         this.desc = desc
         this.cliente = cliente
         this.status = status
+        this.prioridade = prioridade
     }
 }
