@@ -62,7 +62,7 @@ AppDataSource.initialize()
             }
         });
 
-        // Rota para pegar o usuário pelo email
+        // Rota para pegar checar se o usuário existe na tabela do tipo e checar se a senha está correta 
         app.get('/login/:email/:password/:type', async (req: Request, res: Response) => {
             const email = req.params.email;
             const senha = req.params.password;
@@ -74,50 +74,47 @@ AppDataSource.initialize()
                 const atendente = await buscarTodosAtendentes();
                 const administrador = await buscarTodosAdministradores();
 
-                var validType = false
-
                 for (let i = 0; i < usuario.length; i++) {
-                    switch (tipo){
+                    switch (tipo){ // switch case para verificar se o usuário é do tipo que está tentando logar
                         case 'cliente':
                             for (let x = 0; x < cliente.length; x++) {
-                                validType = false
+                                var validType = false
                                 if (usuario[i].id == cliente[x].usuario.id) {
                                     validType = true
+                                    break
                                 }
-                                break
                             }
                             break
                         case 'atendente':
                             for (let x = 0; x < atendente.length; x++) {
-                                validType = false
+                                var validType = false
                                 if (usuario[i].id == atendente[x].usuario.id) {
                                     validType = true
+                                    break
                                 }
-                                break
                             }
                             break
                         case 'administrador':
                             for (let x = 0; x < administrador.length; x++) {
-                                validType = false
+                                var validType = false
                                 if (usuario[i].id == administrador[x].usuario.id) {
                                     validType = true
+                                    break
                                 }
-                                break
                             }
                             break
                     }
                     var validUser = false
-                    if (usuario[i].email == email) {
+                    if (usuario[i].email == email) { // verifica se o usuário existe
                         validUser = true
                         var validPassword = false
-                        if (usuario[i].senha == senha) {
+                        if (usuario[i].senha == senha) { // verifica se a senha está correta
                             validPassword = true
                         }
                         break
                     }
                 }
-
-                res.json({validUser, validPassword, validType});
+                res.json({validUser, validPassword, validType}); // ele retorna apenas se o usuário existe, se a senha está correta e se o tipo de usuário está correto
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Erro ao buscar o usuário' });
