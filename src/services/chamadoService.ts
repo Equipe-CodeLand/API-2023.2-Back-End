@@ -2,11 +2,22 @@ import { AppDataSource, getChamadoRepository } from "../config/data-source";
 import Chamado from "../entities/chamado.entity";
 import Prioridade from "../entities/prioridade.entity";
 import Status from "../entities/status.entity";
+import { buscarAtendente } from "./atendenteService";
 import { buscarCliente } from "./clienteService";
 
 const chamadoRepository = AppDataSource.getRepository(Chamado)
 const statusRepository = AppDataSource.getRepository(Status)
 const prioridadeRepository = AppDataSource.getRepository(Prioridade)
+
+export async function atribuirAtendente(idChamado: number, idAtendente: number){
+    let chamado = await buscarChamado(idChamado);
+    let atendente = await buscarAtendente(idAtendente);
+    chamado.atendente = atendente
+    return chamadoRepository.save(chamado)
+    
+}
+
+
 
 export async function criarChamado(idCliente: number, tema: string, desc: string) {
     const cliente = await buscarCliente(idCliente)

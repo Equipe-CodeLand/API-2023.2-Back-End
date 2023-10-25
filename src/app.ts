@@ -4,10 +4,12 @@ import { Request, Response } from 'express';
 import { buscarUsuario, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { cadastrarCliente, criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { criarChamado } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { atribuirAtendente, criarChamado } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens } from "./services/mensagemService";
+import Atendente from "./entities/atendente.entity";
+import { buscarAtendentes } from "./services/atendenteService";
 
 const express = require('express');
 const app = express();
@@ -48,6 +50,16 @@ AppDataSource.initialize()
                 })    
         })
 
+        app.get('/atendentes', async (req: Request, res: Response) => {
+            try {
+                const atendentes = await buscarAtendentes();
+                res.json(atendentes);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao obter os atentendes' });
+            }
+        });
+
         // Rota para obter informações de um usuário
         app.get('/usuarios/:id', async (req: Request, res: Response) => {
             const usuarioId = parseInt(req.params.id);
@@ -59,6 +71,16 @@ AppDataSource.initialize()
                 res.status(500).json({ message: 'Erro ao buscar o usuário' });
             }
         });
+
+        // atribuir atendente
+        app.post('http://localhost:5000/atribuirAtendente/', async (req: Request, res: Response) => {
+            atribuirAtendente(req.body.chamadoId, req.body.atendenteId).then(() => {
+                res.send('Atendente atribuido')
+            }).catch(() => {
+                res.send('erro ao atribuir atendente')
+            })
+        })
+
 
         // Rota para cadastrar um usuário
         app.post('/usuarios', async (req: Request, res: Response) => {
@@ -108,3 +130,5 @@ AppDataSource.initialize()
     .catch((err) => {
         console.error("Error during Data Source initialization:", err)
     });
+
+    
