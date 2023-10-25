@@ -1,15 +1,18 @@
 import { AppDataSource, getChamadoRepository } from "../config/data-source";
 import Chamado from "../entities/chamado.entity";
+import Prioridade from "../entities/prioridade.entity";
 import Status from "../entities/status.entity";
 import { buscarCliente } from "./clienteService";
 
 const chamadoRepository = AppDataSource.getRepository(Chamado)
 const statusRepository = AppDataSource.getRepository(Status)
+const prioridadeRepository = AppDataSource.getRepository(Prioridade)
 
 export async function criarChamado(idCliente: number, tema: string, desc: string) {
     const cliente = await buscarCliente(idCliente)
     const status = await statusRepository.findOneBy({id: 1})
-    return chamadoRepository.save(new Chamado(tema, desc, cliente, status))
+    const prioridade = await prioridadeRepository.findOneBy({id: 1})
+    return chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade))
 }
 
 export async function buscarChamado(id: number) {
@@ -36,6 +39,10 @@ async function buscarChamadosComInformacoes() {
                 id: true,
                 nome: true
             },
+            'prioridade':{
+                id: true,
+                nome: true
+            },
             "cliente":{
                 "usuario":{
                     id: true,
@@ -45,7 +52,8 @@ async function buscarChamadosComInformacoes() {
             }},
         relations:{
             cliente: {usuario: true},
-            status: true
+            status: true,
+            prioridade: true
         }
     })
     return chamados;
