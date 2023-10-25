@@ -1,11 +1,14 @@
 import "reflect-metadata";
 import { AppDataSource } from "./config/data-source";
 import { Request, Response } from 'express';
-import { buscarUsuario, buscarUsuarioPorEmail, cadastrarUsuario } from "./services/usuarioService";
+import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
-import { cadastrarCliente, criarCliente } from "./services/clienteService";
+import { cadastrarCliente, criarCliente, buscarTodosClientes } from "./services/clienteService";
 import buscarChamadosComInformacoes, { criarChamado } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
+import Atendente from "./entities/atendente.entity";
+import { buscarTodosAtendentes } from "./services/atendenteService";
+import { buscarTodosAdministradores } from "./services/administradorService";
 
 const express = require('express');
 const app = express();
@@ -41,7 +44,6 @@ AppDataSource.initialize()
             const usuarioId = parseInt(req.params.id);
             try {
                 const usuario = await buscarUsuario(usuarioId);
-                res.json(usuario);
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Erro ao buscar o usuário' });
@@ -61,11 +63,61 @@ AppDataSource.initialize()
         });
 
         // Rota para pegar o usuário pelo email
-        app.get('/login/:email', async (req: Request, res: Response) => {
+        app.get('/login/:email/:password/:type', async (req: Request, res: Response) => {
             const email = req.params.email;
+            const senha = req.params.password;
+            const tipo = req.params.type;
+
             try {
-                const usuario = await buscarUsuarioPorEmail(email);
-                res.json(usuario);
+                const usuario = await buscarTodosUsuarios();
+                const cliente = await buscarTodosClientes();
+                const atendente = await buscarTodosAtendentes();
+                const administrador = await buscarTodosAdministradores();
+
+                var validType = false
+
+                for (let i = 0; i < usuario.length; i++) {
+                    switch (tipo){
+                        case 'cliente':
+                            for (let x = 0; x < cliente.length; x++) {
+                                validType = false
+                                if (usuario[i].id == cliente[x].usuario.id) {
+                                    validType = true
+                                }
+                                break
+                            }
+                            break
+                        case 'atendente':
+                            for (let x = 0; x < atendente.length; x++) {
+                                validType = false
+                                if (usuario[i].id == atendente[x].usuario.id) {
+                                    validType = true
+                                }
+                                break
+                            }
+                            break
+                        case 'administrador':
+                            for (let x = 0; x < administrador.length; x++) {
+                                validType = false
+                                if (usuario[i].id == administrador[x].usuario.id) {
+                                    validType = true
+                                }
+                                break
+                            }
+                            break
+                    }
+                    var validUser = false
+                    if (usuario[i].email == email) {
+                        validUser = true
+                        var validPassword = false
+                        if (usuario[i].senha == senha) {
+                            validPassword = true
+                        }
+                        break
+                    }
+                }
+
+                res.json({validUser, validPassword, validType});
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Erro ao buscar o usuário' });

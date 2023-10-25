@@ -7,8 +7,8 @@ export async function buscarUsuario(id: number) {
     return usuarioRepository.findOneBy({id: id})
 }
 
-export async function buscarUsuarioPorEmail(email: string) {
-    return usuarioRepository.findOneBy({email: email})
+export async function buscarTodosUsuarios() {
+    return usuarioRepository.find()
 }
 
 export async function cadastrarUsuario(usuario: Usuario) {
