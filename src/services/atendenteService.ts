@@ -4,6 +4,7 @@ import { atrubuirAtendente } from "./chamadoService";
 
 const atendenteRepository = AppDataSource.getRepository(Atendente);
 
+//function para buscar os atendentes
 export async function buscarAtendente(idAtendente: number) {
     return atendenteRepository.findOneBy({id: idAtendente})
 }
