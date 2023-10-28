@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { buscarUsuario, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { cadastrarCliente, criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { criarChamado } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { criarChamado, dropdownChamados } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens } from "./services/mensagemService";
@@ -96,7 +96,15 @@ AppDataSource.initialize()
             }
         });
 
-
+        app.post('/dropdownChamados', async (req: Request, res: Response) => {
+            try {
+                const chamados = await dropdownChamados();
+                res.json(chamados);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send('Ocorreu um erro ao buscar e despachar os chamados');
+            }
+        });        
 
         const PORT = process.env.PORT || 5000;
 
