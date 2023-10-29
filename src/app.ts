@@ -9,6 +9,9 @@ import buscarChamados from "./services/chamadoService";
 import Atendente from "./entities/atendente.entity";
 import { buscarTodosAtendentes } from "./services/atendenteService";
 import { buscarTodosAdministradores } from "./services/administradorService";
+import jwt from 'jsonwebtoken';
+import { generateAuthToken, getUserRoles } from "./middlewares/authenticate";
+import { getRepository } from "typeorm";
 
 const express = require('express');
 const app = express();
@@ -27,6 +30,28 @@ AppDataSource.initialize()
         app.get('/', (req, res) => {
             return res.json('Back-End');
         });
+
+        // rota para autenticar usuário
+        app.post('/login', async (req, res) => {
+            const { email, senha } = req.body;
+            console.log(`Estas são as variaveis manipuladas: ${email}, ${senha}`);
+            
+            try {
+              const userRepository = AppDataSource.getRepository(Usuario);
+              const usuario = await userRepository.findOneBy({email: email})
+              if (!usuario || usuario.senha !== senha) {
+                return res.status(401).json({ error: "Credenciais inválidas" });
+              } else {
+                const token = generateAuthToken(usuario);
+                console.log("O token foi criado");
+                res.json({ token });
+              }
+          
+            } catch (error) {
+              console.error(error);
+              res.status(500).json({ error: "Erro no servidor" });
+            }
+          });
 
         // Rota para obter chamados (administrador)
         app.get('/adm/chamados', async (req: Request, res: Response) => {
