@@ -33,7 +33,7 @@ export default class Chamado {
     @JoinColumn({name: 'sta_id'})
     public status: Status
 
-    @ManyToOne(() => Atendente, (atendente) => atendente.chamados)
+    @ManyToOne(() => Atendente, (atendente) => atendente.chamados, {eager:true})
     @JoinColumn({name: 'ate_id'})
     public atendente: Atendente
 

@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { buscarUsuario, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { cadastrarCliente, criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { criarChamado, dropdownChamados } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { buscarChamadosComInformacoesCli, criarChamado, dropdownChamados } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens } from "./services/mensagemService";
@@ -32,6 +32,17 @@ AppDataSource.initialize()
             try {
                 const chamadosComInformacoes = await buscarChamadosComInformacoes();
                 res.json(chamadosComInformacoes);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Erro ao obter os chamados' });
+            }
+        });
+
+        app.get('/chamadosCli', async (req: Request, res: Response) => {
+            try {
+                const chamadosComInformacoesCli = await buscarChamadosComInformacoesCli();
+                console.log(chamadosComInformacoesCli)
+                res.json(chamadosComInformacoesCli);
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Erro ao obter os chamados' });

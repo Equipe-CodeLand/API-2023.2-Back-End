@@ -69,6 +69,36 @@ async function buscarChamadosComInformacoes() {
     return chamados;
 }
 
+export async function buscarChamadosComInformacoesCli() {
+    const chamadosCli = await getChamadoRepository().find({
+        select:{
+            "id":true,
+            "tema":{
+                id: true,
+                nome: true
+            },
+            "inicio":true,
+            "final":true,
+            "desc":true,
+            'status':{
+                id: true,
+                nome: true
+            },
+            "atendente":{
+                "usuario":{
+                    id: true,
+                    nome: true,
+                }
+            }},
+        relations:{
+            atendente: {usuario: true},
+            status: true,
+            tema: true
+        }
+    });
+    return chamadosCli;
+}
+
 export async function definirPrioridade(tema: Tema) {
     switch(tema.nome){
         case 'Sem acesso a internet':
@@ -84,6 +114,7 @@ export async function definirPrioridade(tema: Tema) {
     }
 
 }
+
 
 export async function dropdownChamados() {
     const chamados = await getChamadoRepository().find({
