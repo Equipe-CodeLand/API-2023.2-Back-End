@@ -86,15 +86,15 @@ AppDataSource.initialize()
 
         // Rota para criar um chamado
         app.post('/criarChamados', async (req: Request, res: Response) => {
-            const { idCliente, tema, desc } = req.body; // Certifique-se de enviar os dados corretos no corpo da requisição
             try {
-                const chamado = await criarChamado(idCliente, tema, desc);
+                const chamado = await criarChamado(req);
                 res.json(chamado);
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Erro ao criar o chamado' });
             }
         });
+        
 
         app.post('/dropdownChamados', async (req: Request, res: Response) => {
             try {

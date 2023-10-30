@@ -9,11 +9,15 @@ import Tema from "../entities/tema.entity";
 const chamadoRepository = AppDataSource.getRepository(Chamado)
 const statusRepository = AppDataSource.getRepository(Status)
 const prioridadeRepository = AppDataSource.getRepository(Prioridade)
+const temaRepository = AppDataSource.getRepository(Tema)
 
-export async function criarChamado(idCliente: number, tema: Tema, desc: string) {
+export async function criarChamado(req) {
+    const { idCliente, idTema, desc } = req.body;
     const cliente = await buscarCliente(idCliente)
-    const prioridade = await definirPrioridade(tema);
     const status = await statusRepository.findOneBy({id: 1})
+    const tema = await temaRepository.findOneBy({id:idTema})
+    const prioridade = await definirPrioridade(tema);
+    console.log(`idTema recebido: ${idTema}`);
     return chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade))
 }
 
@@ -61,26 +65,24 @@ async function buscarChamadosComInformacoes() {
             prioridade: true,
             tema: true
         }
-    })
+    });
     return chamados;
 }
 
-export async function definirPrioridade(tema: Tema): Promise<Prioridade> {
-    let prioridade = null;
-    
-    if (tema.nome === 'Sem acesso a internet') {
-        prioridade = await Prioridade.findOne(1); 
-    } else if (tema.nome === 'Modem' || tema.nome === 'Outros') {
-        prioridade = await Prioridade.findOne(2); 
-    } else if (tema.nome === 'Velocidade da internet') {
-        prioridade = await Prioridade.findOne(3); 
+export async function definirPrioridade(tema: Tema) {
+    switch(tema.nome){
+        case 'Sem acesso a internet':
+            return await prioridadeRepository.findOneBy({id:1})
+        case 'Modem':
+            return await prioridadeRepository.findOneBy({id:2})
+        case 'Outros':
+            return await prioridadeRepository.findOneBy({id:2})
+        case 'Velocidade da internet':
+            return await prioridadeRepository.findOneBy({id:3})
+        default:
+            return null
     }
-    
-    if (prioridade) {
-        return prioridade;
-    } else {
-        throw new Error('Tema inválido');
-    }
+
 }
 
 export async function dropdownChamados() {
