@@ -39,12 +39,15 @@ AppDataSource.initialize()
             try {
               const userRepository = AppDataSource.getRepository(Usuario);
               const usuario = await userRepository.findOneBy({email: email})
+              const tipoUser = await getUserRoles(usuario)
+              console.log(tipoUser);
+              
               if (!usuario || usuario.senha !== senha) {
                 return res.status(401).json({ error: "Credenciais inválidas" });
               } else {
-                const token = generateAuthToken(usuario);
+                const token = await generateAuthToken(usuario);
                 console.log("O token foi criado");
-                res.json({ token });
+                res.json({ token, tipoUser });
               }
           
             } catch (error) {

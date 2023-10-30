@@ -10,6 +10,12 @@ import Cliente from "../entities/cliente.entity";
 import Atendente from "../entities/atendente.entity";
 import Administrador from "../entities/administador.entity";
 import { AppDataSource } from "../config/data-source";
+import { jwtDecode } from "jwt-decode";
+
+export function decodeJWT(data: string) {
+    const decodedToken = jwtDecode(data);
+    return decodedToken
+  }
 
 export async function getUserRoles(usuario: Usuario) {
   const clienteRepository = AppDataSource.getRepository(Cliente);
@@ -21,21 +27,21 @@ export async function getUserRoles(usuario: Usuario) {
   const administrador = await administradorRepository.findOne({ where: { usuario: usuario } });
 
   if (cliente) {
-    return ["Cliente"];
+    return "Cliente";
   } else if (atendente) {
-    return ["Atendente"];
+    return "Atendente";
   } else if (administrador) {
-    return ["Administrador"];
+    return "Administrador";
   }
 
-  return [];
+  return "Sem cargo";
 }
 
-export function generateAuthToken(usuario: Usuario) {
+export async function generateAuthToken(usuario: Usuario) {
   const payload = {
     userId: usuario.id,
     email: usuario.email,
-    cargo: getUserRoles(usuario),
+    cargo: await getUserRoles(usuario),
   };
 
   return jwt.sign(payload, "decodeToken", { expiresIn: "2h" });
