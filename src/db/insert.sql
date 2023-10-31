@@ -6,6 +6,12 @@ insert into stats(sta_nome) values ("Em Andamento");
 insert into stats(sta_nome) values ("Cancelada");
 insert into stats(sta_nome) values ("Concluída");
 
+-- adicionando o Tema
+insert into tema(tema_nome) values ('Acesso a internet')
+insert into tema(tema_nome) values ('Modem')
+insert into tema(tema_nome) values ('Outros')
+insert into tema(tema_nome) values ('Velocidade da internet')
+
 #adicionando Prioridades
 insert into prioridade(pri_nome) values ("Alta");
 insert into prioridade(pri_nome) values ("Média");
@@ -39,11 +45,15 @@ insert into administrador(user_id) values (7);
 insert into administrador(user_id) values (8);
 
 insert into chamada(cha_desc,cha_inicio,cli_id, sta_id, pri_id, tema_id) values (
+insert into chamada(cha_desc,cha_inicio,cli_id, sta_id, pri_id, tema_id) values (
  "Minha internet anda muito lenta esses dias, não consigo trabalhar",
+ now(),1,2,1,1);
  now(),1,2,1,1);
  
 insert into chamada(cha_desc,cha_inicio,cli_id, sta_id, pri_id, tema_id) values (
+insert into chamada(cha_desc,cha_inicio,cli_id, sta_id, pri_id, tema_id) values (
  "Meu modem está com uma das luses piscando e faz um barulho como se tivesse uma peça solta dentro dele",
+ now(),2,1,2,2);
  now(),2,1,2,2);
 
 insert into chamada(cha_desc,cha_inicio,cli_id, sta_id, pri_id, tema_id) values (
