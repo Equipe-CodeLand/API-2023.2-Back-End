@@ -9,6 +9,10 @@ export async function buscarCliente(id: number) {
     return clienteRepository.findOneBy({id: id})
 }
 
+export async function buscarTodosClientes() {
+    return clienteRepository.find()
+}
+
 export async function criarCliente(usuario: Usuario) {
     const usuarioCriado = await cadastrarUsuario(usuario)
     return clienteRepository.save(new Cliente(usuarioCriado))
