@@ -44,35 +44,40 @@ export async function generateAuthToken(usuario: Usuario) {
     cargo: await getUserRoles(usuario),
   };
 
-  return jwt.sign(payload, "decodeToken", { expiresIn: "2h" });
+  return jwt.sign(payload, "decodeToken", { expiresIn: "1h" });
 }
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header("Authorization")?.replace("Bearer ", "");
+  const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {
-    return res.status(401).json({ error: "Token não fornecido" });
+    return res.status(401).json({ error: 'Token não fornecido' });
   }
 
   try {
-    const decoded = jwt.verify(token, "decodeToken") as { userId: number; email: string; roles: string[] };
-
+    const decoded = jwt.verify(token, 'decodeToken') as { userId: number; email: string; cargo: string };
+    
     (req as any).user = decoded;
 
     next();
   } catch (error) {
     console.error(error);
-    res.status(401).json({ error: "Token inválido" });
+    
+    res.status(401).json({ error: 'Token inválido' });
   }
 };
 
-export const authorize = (roles: string[]) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-      if (!roles.some(role => (req as any).user.roles.includes(role))) {
-        return res.status(403).json({ error: 'Acesso não autorizado' });
-      }
+export const authorize = (requiredRoles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const userRole = (req as any).user.cargo;
 
-      next();
+    if (!requiredRoles.includes(userRole)) {
+
+      return res.status(403).json({ error: 'Acesso negado' });
     }
+    
+    
+    next();
+  };
 };
 
