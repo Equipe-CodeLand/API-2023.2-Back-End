@@ -91,8 +91,8 @@ app.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Requ
     }
 });
 
-app.get('/atendenteChamados/:id', (req, res) => {
-    buscarChamadosAtendente(req.params.id)
+app.get('/atendenteChamados/:userId', (req, res) => {
+    buscarChamadosAtendente(req.params.userId)
         .then(chamados => {
             res.json(chamados)
         })

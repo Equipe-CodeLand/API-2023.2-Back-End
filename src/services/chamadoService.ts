@@ -5,6 +5,7 @@ import Prioridade from "../entities/prioridade.entity";
 import Status from "../entities/status.entity";
 import { buscarCliente } from "./clienteService";
 import Tema from "../entities/tema.entity";
+import { buscarAtendentePorUserId } from "./atendenteService";
 
 const chamadoRepository = AppDataSource.getRepository(Chamado)
 const statusRepository = AppDataSource.getRepository(Status)
@@ -70,6 +71,7 @@ async function buscarChamadosComInformacoes() {
 }
 
 export async function buscarChamadosAtendente(id: number) {
+    let atendente = await buscarAtendentePorUserId(id)
     return chamadoRepository.find({
         select:{
             "id":true,
@@ -101,7 +103,7 @@ export async function buscarChamadosAtendente(id: number) {
             prioridade: true,
             tema: true
         },
-        where: {atendente: {id: id }}
+        where: {atendente: {id: atendente.id}}
     })
 }
 

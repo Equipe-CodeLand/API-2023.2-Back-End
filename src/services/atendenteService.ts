@@ -14,6 +14,10 @@ export async function buscarAtendente(id: number) {
     return atendenteRepository.findOneBy({id: id})
 }
 
+export async function buscarAtendentePorUserId(userId: number) {
+    return atendenteRepository.findOneBy({usuario: {id: userId}})
+}
+
 
 /*export async function buscarAtendentePorId(atendenteId: number) {
     try {
