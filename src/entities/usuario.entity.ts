@@ -28,11 +28,12 @@ export default class Usuario {
     @OneToMany(() => Mensagem, (mensagem) => mensagem.usuario)
     public mensagens: Mensagem[]
 
-    constructor(nome: string, sobrenome: string, cpf: string, email: string, telefone: string) {
+    constructor(nome: string, sobrenome: string, cpf: string, email: string, telefone: string, senha: string) {
         this.nome = nome
         this.sobrenome = sobrenome
         this.cpf = cpf
         this.email = email
         this.telefone = telefone
+        this.senha = senha
     }
 }

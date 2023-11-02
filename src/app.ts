@@ -3,7 +3,7 @@ import { AppDataSource } from "./config/data-source";
 import { Request, Response } from 'express';
 import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
-import { cadastrarCliente, criarCliente } from "./services/clienteService";
+import { criarCliente } from "./services/clienteService";
 import buscarChamadosComInformacoes, { buscarChamadosComInformacoesCli, criarChamado, dropdownChamados } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
@@ -118,7 +118,7 @@ app.get('/usuarios/:id',async (req: Request, res: Response) => {
 app.post('/usuarios', authenticate, authorize(['Administrador']), async (req: Request, res: Response) => {
     const novoUsuario = req.body; // Certifique-se de enviar os dados corretos no corpo da requisição
     try {
-        const usuario = await cadastrarUsuario(new Usuario(novoUsuario.nome, novoUsuario.sobrenome, novoUsuario.cpf, novoUsuario.email, novoUsuario.telefone));
+        const usuario = await cadastrarUsuario(new Usuario(novoUsuario.nome, novoUsuario.sobrenome, novoUsuario.cpf, novoUsuario.email, novoUsuario.telefone, novoUsuario.senha))
         res.json(usuario);
     } catch (error) {
         console.error(error);
@@ -127,7 +127,7 @@ app.post('/usuarios', authenticate, authorize(['Administrador']), async (req: Re
 });
 
 // Rota para cadastrar um cliente
-app.post('/clientes', async (req: Request, res: Response) => {
+/*app.post('/clientes', async (req: Request, res: Response) => {
     const clienteId = req.body.id; // Certifique-se de enviar o ID do cliente no corpo da requisição
     try {
         const cliente = await cadastrarCliente(clienteId);
@@ -136,7 +136,23 @@ app.post('/clientes', async (req: Request, res: Response) => {
         console.error(error);
         res.status(500).json({ message: 'Erro ao cadastrar o cliente' });
     }
-});
+});*/
+
+// Rota para cadastro do cliente (formulário)
+app.post('/cadastro/cliente', async (req: Request, res: Response)=>{
+    try {                
+        // Crie um novo objeto de Usuario com os dados do corpo da requisição
+        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+    
+        // Chame a função criarCliente passando o novo usuário
+        const clienteCriado = await criarCliente(novoUsuario);
+    
+        // Retorne a resposta para o cliente
+        res.json(clienteCriado);
+      } catch (error) {
+        res.status(500).json({ message: 'Erro ao criar cliente' });
+      }
+  })
 
 // Rota para criar um chamado
 app.post('/criarChamados', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {

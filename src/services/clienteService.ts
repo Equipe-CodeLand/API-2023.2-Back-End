@@ -18,7 +18,7 @@ export async function criarCliente(usuario: Usuario) {
     return clienteRepository.save(new Cliente(usuarioCriado))
 }
 
-export async function cadastrarCliente(idUsuario: number) {
+/*export async function cadastrarCliente(idUsuario: number) {
     const usuario = await buscarUsuario(idUsuario)
     return clienteRepository.save(new Cliente(usuario))
-}
+}*/
