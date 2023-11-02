@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { buscarChamadosComInformacoesCli, criarChamado, dropdownChamados } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { buscarChamadosAtendente, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens } from "./services/mensagemService";
@@ -89,7 +89,18 @@ app.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Requ
         console.error(error);
         res.status(500).json({ message: 'Erro ao obter os chamados' });
     }
-});          
+});
+
+app.get('/atendenteChamados/:id', (req, res) => {
+    buscarChamadosAtendente(req.params.id)
+        .then(chamados => {
+            res.json(chamados)
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ message: 'Erro ao obter os chamados' });
+        })
+})
         
 // Rota para obter chamados (cliente)
 app.get('/chamadosCli', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {

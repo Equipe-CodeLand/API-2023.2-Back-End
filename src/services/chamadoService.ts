@@ -69,6 +69,42 @@ async function buscarChamadosComInformacoes() {
     return chamados;
 }
 
+export async function buscarChamadosAtendente(id: number) {
+    return chamadoRepository.find({
+        select:{
+            "id":true,
+            "tema":{
+                id: true,
+                nome: true
+            },
+            "inicio":true,
+            "final":true,
+            "desc":true,
+            'status':{
+                id: true,
+                nome: true
+            },
+            'prioridade':{
+                id: true,
+                nome: true
+            },
+            "cliente":{
+                "usuario":{
+                    id: true,
+                    nome: true,
+                    email: true
+                }
+            }},
+        relations:{
+            cliente: {usuario: true},
+            status: true,
+            prioridade: true,
+            tema: true
+        },
+        where: {atendente: {id: id }}
+    })
+}
+
 export async function buscarChamadosComInformacoesCli() {
     const chamadosCli = await getChamadoRepository().find({
         select:{
