@@ -22,7 +22,7 @@ export default class Usuario {
     @Column({ name: 'user_telefone', length: 15, nullable: false })
     public telefone: string
 
-    @Column({ name: 'user_senha', length: 20, nullable: true, select: true })
+    @Column({ name: 'user_senha', length: 8, nullable: true, select: true })
     public senha: string
 
     @OneToMany(() => Mensagem, (mensagem) => mensagem.usuario)

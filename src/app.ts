@@ -9,8 +9,8 @@ import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens } from "./services/mensagemService";
 import Atendente from "./entities/atendente.entity";
-import { buscarTodosAtendentes } from "./services/atendenteService";
-import { buscarTodosAdministradores } from "./services/administradorService";
+import { buscarTodosAtendentes, criarAtendente } from "./services/atendenteService";
+import { buscarTodosAdministradores, criarAdministrador } from "./services/administradorService";
 import jwt from 'jsonwebtoken';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from "./middlewares/authenticate";
 import { getRepository } from "typeorm";
@@ -154,6 +154,27 @@ app.post('/cadastro/cliente', async (req: Request, res: Response)=>{
       }
   })
 
+  app.post('/cadastro/atendente',async (req,res)=>{
+    try{
+        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+        const atendenteCriado = await criarAtendente(req.body.turno, novoUsuario);
+        res.json(atendenteCriado)
+    }catch(error){
+        res.status(500).json({ message: 'Erro ao criar atendente' });
+    }
+  })
+
+
+  // Rota para criar administrador
+  app.post('/cadastro/administrador', async (req,res)=>{
+    try{
+        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+        const adminCriado = await criarAdministrador(novoUsuario);
+        res.json(adminCriado)
+    }catch(error){
+        res.status(500).json({mesaage: 'Erro ao criar o administrador'})
+    }
+  })
 // Rota para criar um chamado
 app.post('/criarChamados', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {
     try {
