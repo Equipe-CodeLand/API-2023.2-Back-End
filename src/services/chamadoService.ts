@@ -113,7 +113,7 @@ export async function buscarChamadosComInformacoesCli() {
         relations:{
             atendente: {usuario: true},
             status: true,
-            tema: true
+            tema: true,
         }
     });
     return chamadosCli;
@@ -134,7 +134,6 @@ export async function definirPrioridade(tema: Tema) {
     }
 
 }
-
 
 export async function dropdownChamados() {
     const chamados = await getChamadoRepository().find({

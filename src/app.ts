@@ -81,8 +81,8 @@ app.get('/chamados', authenticate, authorize(['Administrador']), async (req: Req
 // Rota para obter chamados (atendente)
 app.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Request, res: Response) => {
     try {
-        const chamadosComInformacoes = await buscarChamadosComInformacoes();
-        res.json(chamadosComInformacoes);
+        const chamadosAte = await buscarChamadosComInformacoes();
+        res.json(chamadosAte);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Erro ao obter os chamados' });
