@@ -115,6 +115,29 @@ export async function definirPrioridade(tema: Tema) {
 
 }
 
+export async function andamentoChamado(idChamado: number) {
+    const chamado = await buscarChamado(idChamado)
+    const status = await statusRepository.findOneBy({id: 2})
+    
+    chamado.status = status
+
+    await chamadoRepository.save(chamado)
+
+    return chamado
+}
+
+export async function finalizarChamado(idChamado: number, idStatus: number) {
+    const chamado = await buscarChamado(idChamado)
+    const status = await statusRepository.findOneBy({id: idStatus})
+    
+    chamado.status = status
+
+    chamado.final = new Date()
+
+    await chamadoRepository.save(chamado)
+
+    return chamado
+}
 
 export async function dropdownChamados() {
     const chamados = await getChamadoRepository().find({
