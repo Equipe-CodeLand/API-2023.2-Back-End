@@ -3,22 +3,42 @@ import { AppDataSource, getChamadoRepository } from "../config/data-source";
 import Chamado from "../entities/chamado.entity";
 import Prioridade from "../entities/prioridade.entity";
 import Status from "../entities/status.entity";
-import { buscarCliente } from "./clienteService";
 import Tema from "../entities/tema.entity";
+import { NextFunction } from "express-serve-static-core";
+import jwt from 'jsonwebtoken';
+import bodyParser from 'body-parser';
+import { Request } from 'express';
+import { buscarUsuario } from "./usuarioService";
+import { buscarClientePorUserId } from "./clienteService";
 
 const chamadoRepository = AppDataSource.getRepository(Chamado)
 const statusRepository = AppDataSource.getRepository(Status)
 const prioridadeRepository = AppDataSource.getRepository(Prioridade)
 const temaRepository = AppDataSource.getRepository(Tema)
 
-export async function criarChamado(req) {
-    const { idCliente, idTema, desc } = req.body;
-    const cliente = await buscarCliente(idCliente)
-    const status = await statusRepository.findOneBy({id: 1})
-    const tema = await temaRepository.findOneBy({id:idTema})
-    const prioridade = await definirPrioridade(tema);
-    console.log(`idTema recebido: ${idTema}`);
-    return chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade))
+export async function criarChamado(req: Request) {
+    try {
+      // Busca o cliente usando a requisição
+      const cliente = await buscarClientePorUserId(req.body.userId)
+      console.log(cliente)
+      console.log(req.body);
+      
+      const idTema = parseInt(req.body.idTema); // Converte idTema para número
+      const desc = req.body.desc;
+      
+      const status = await statusRepository.findOneBy({id: 1})
+      const tema = await temaRepository.findOneBy({id:idTema})
+      console.log(tema);
+      const prioridade = await definirPrioridade(tema);
+      console.log(prioridade);
+      
+      console.log(`idTema recebido: ${idTema}`);
+      
+      return chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade));
+    } catch (error) {
+      console.error(error);
+      throw new Error('Erro ao criar chamado');
+    }
 }
 
 export async function buscarChamado(id: number) {

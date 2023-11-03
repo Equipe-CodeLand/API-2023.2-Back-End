@@ -3,17 +3,14 @@ import { AppDataSource } from "./config/data-source";
 import { Request, Response } from 'express';
 import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
-import { criarCliente } from "./services/clienteService";
+import {  criarCliente } from "./services/clienteService";
 import buscarChamadosComInformacoes, { buscarChamadosComInformacoesCli, criarChamado, dropdownChamados } from "./services/chamadoService";
-import buscarChamados from "./services/chamadoService";
-import Chamado from "./entities/chamado.entity";
 import { buscarMensagens } from "./services/mensagemService";
 import Atendente from "./entities/atendente.entity";
 import { buscarTodosAtendentes, criarAtendente } from "./services/atendenteService";
 import { buscarTodosAdministradores, criarAdministrador } from "./services/administradorService";
 import jwt from 'jsonwebtoken';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from "./middlewares/authenticate";
-import { getRepository } from "typeorm";
 
 const express = require('express');
 const app = express();
@@ -22,6 +19,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 AppDataSource.initialize()
     .then(() => {
