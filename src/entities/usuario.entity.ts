@@ -22,17 +22,18 @@ export default class Usuario {
     @Column({ name: 'user_telefone', length: 15, nullable: false })
     public telefone: string
 
-    @Column({ name: 'user_senha', length: 20, nullable: true, select: false })
+    @Column({ name: 'user_senha', length: 8, nullable: true, select: true })
     public senha: string
 
     @OneToMany(() => Mensagem, (mensagem) => mensagem.usuario)
     public mensagens: Mensagem[]
 
-    constructor(nome: string, sobrenome: string, cpf: string, email: string, telefone: string) {
+    constructor(nome: string, sobrenome: string, cpf: string, email: string, telefone: string, senha: string) {
         this.nome = nome
         this.sobrenome = sobrenome
         this.cpf = cpf
         this.email = email
         this.telefone = telefone
+        this.senha = senha
     }
 }

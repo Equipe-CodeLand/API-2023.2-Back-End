@@ -4,6 +4,7 @@ import Status from "./status.entity";
 import Atendente from "./atendente.entity";
 import Mensagem from "./mensagem.entity";
 import Prioridade from "./prioridade.entity";
+import Tema from "./tema.entity";
 
 @Entity({name: 'chamada'})
 export default class Chamado {
@@ -11,8 +12,9 @@ export default class Chamado {
     @PrimaryGeneratedColumn({name: 'cha_id'})
     public id: number
 
-    @Column({name: 'cha_tema', length: 30})
-    public tema: string
+    @ManyToOne(() => Tema, (tema) => tema.chamados)
+    @JoinColumn({name: 'tema_id'})
+    public tema: Tema
 
     @Column({name: 'cha_desc', length: 255})
     public desc: string
@@ -31,7 +33,7 @@ export default class Chamado {
     @JoinColumn({name: 'sta_id'})
     public status: Status
 
-    @ManyToOne(() => Atendente, (atendente) => atendente.chamados)
+    @ManyToOne(() => Atendente, (atendente) => atendente.chamados, {eager:true})
     @JoinColumn({name: 'ate_id'})
     public atendente: Atendente
 
@@ -42,7 +44,7 @@ export default class Chamado {
     @OneToMany(() => Mensagem, (mensagem) => mensagem.chamado)
     public mensagens: Mensagem[];
 
-    constructor(tema: string, desc: string, cliente: Cliente, status: Status, prioridade: Prioridade) {
+    constructor(tema: Tema, desc: string, cliente: Cliente, status: Status, prioridade: Prioridade) {
         this.tema = tema
         this.desc = desc
         this.cliente = cliente
