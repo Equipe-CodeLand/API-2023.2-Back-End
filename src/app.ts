@@ -13,7 +13,6 @@ import { buscarTodosAtendentes, criarAtendente } from "./services/atendenteServi
 import { buscarTodosAdministradores, criarAdministrador } from "./services/administradorService";
 import jwt from 'jsonwebtoken';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from "./middlewares/authenticate";
-import { getRepository } from "typeorm";
 
 const express = require('express');
 const app = express();
@@ -22,6 +21,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 AppDataSource.initialize()
     .then(() => {
@@ -83,8 +83,8 @@ app.get('/chamados', authenticate, authorize(['Administrador']), async (req: Req
 // Rota para obter chamados (atendente)
 app.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Request, res: Response) => {
     try {
-        const chamadosComInformacoes = await buscarChamadosComInformacoes();
-        res.json(chamadosComInformacoes);
+        const chamadosAte = await buscarChamadosComInformacoes();
+        res.json(chamadosAte);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Erro ao obter os chamados' });
