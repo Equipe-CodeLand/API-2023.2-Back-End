@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { atribuirAtendente, andamentoChamado, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados, finalizarChamado } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { atribuirAtendente, andamentoChamado, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados, finalizarChamado, buscarChamadosAtendente } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens, enviarMensagem } from "./services/mensagemService";

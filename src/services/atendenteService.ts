@@ -1,6 +1,5 @@
 import { AppDataSource } from "../config/data-source";
 import Atendente from "../entities/atendente.entity";
-import { atrubuirAtendente } from "./chamadoService";
 import Usuario from "../entities/usuario.entity";
 import { cadastrarUsuario } from "./usuarioService";
 
@@ -21,9 +20,6 @@ export async function buscarAtendentes(){
     return atendenteRepository.find()
 }
 
-export async function buscarAtendente(id: number) {
-    return atendenteRepository.findOneBy({id: id})
-}
 
 export async function buscarAtendentePorUserId(userId: number) {
     return atendenteRepository.findOneBy({usuario: {id: userId}})

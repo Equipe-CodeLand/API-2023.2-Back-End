@@ -4,7 +4,6 @@ import Chamado from "../entities/chamado.entity";
 import Prioridade from "../entities/prioridade.entity";
 import Status from "../entities/status.entity";
 import { buscarAtendente } from "./atendenteService";
-import { buscarCliente } from "./clienteService";
 import Tema from "../entities/tema.entity";
 import { buscarAtendentePorUserId } from "./atendenteService";
 import { NextFunction } from "express-serve-static-core";
