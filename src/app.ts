@@ -4,12 +4,12 @@ import { Request, Response } from 'express';
 import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { andamentoChamado, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados, finalizarChamado } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { atribuirAtendente, andamentoChamado, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados, finalizarChamado } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens, enviarMensagem } from "./services/mensagemService";
 import Atendente from "./entities/atendente.entity";
-import { buscarTodosAtendentes, criarAtendente } from "./services/atendenteService";
+import { buscarAtendentes, buscarTodosAtendentes, criarAtendente } from "./services/atendenteService";
 import { buscarTodosAdministradores, criarAdministrador } from "./services/administradorService";
 import jwt from 'jsonwebtoken';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from "./middlewares/authenticate";
@@ -26,7 +26,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 AppDataSource.initialize()
     .then(() => {
         console.log("Data Source has been initialized!");
-
     }).catch((err) => {
         console.error("Error during Data Source initialization:", err)
     });
@@ -68,6 +67,15 @@ app.post('/login', async (req, res) => {
       res.status(500).json({ error: "Erro no servidor" });
     }
   });
+
+// atribuir atendente
+        app.post('http://localhost:5000/atribuirAtendente/', async (req: Request, res: Response) => {
+            atribuirAtendente(req.body.chamadoId, req.body.atendenteId).then(() => {
+                res.send('Atendente atribuido')
+            }).catch(() => {
+                res.send('erro ao atribuir atendente')
+            })
+        })
 
 // Rota para obter chamados (administrador)
 app.get('/chamados', authenticate, authorize(['Administrador']), async (req: Request, res: Response) => {
