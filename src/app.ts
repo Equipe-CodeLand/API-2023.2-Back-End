@@ -89,7 +89,18 @@ app.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Requ
         console.error(error);
         res.status(500).json({ message: 'Erro ao obter os chamados' });
     }
-});          
+});
+
+app.get('/atendenteChamados/:userId', (req, res) => {
+    buscarChamadosAtendente(req.params.userId)
+        .then(chamados => {
+            res.json(chamados)
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ message: 'Erro ao obter os chamados' });
+        })
+})
         
 // Rota para obter chamados (cliente)
 app.get('/chamadosCli', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {

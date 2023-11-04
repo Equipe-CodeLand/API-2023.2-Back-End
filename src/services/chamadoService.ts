@@ -4,6 +4,7 @@ import Chamado from "../entities/chamado.entity";
 import Prioridade from "../entities/prioridade.entity";
 import Status from "../entities/status.entity";
 import Tema from "../entities/tema.entity";
+import { buscarAtendentePorUserId } from "./atendenteService";
 import { NextFunction } from "express-serve-static-core";
 import jwt from 'jsonwebtoken';
 import bodyParser from 'body-parser';
@@ -87,6 +88,43 @@ async function buscarChamadosComInformacoes() {
         }
     });
     return chamados;
+}
+
+export async function buscarChamadosAtendente(id: number) {
+    let atendente = await buscarAtendentePorUserId(id)
+    return chamadoRepository.find({
+        select:{
+            "id":true,
+            "tema":{
+                id: true,
+                nome: true
+            },
+            "inicio":true,
+            "final":true,
+            "desc":true,
+            'status':{
+                id: true,
+                nome: true
+            },
+            'prioridade':{
+                id: true,
+                nome: true
+            },
+            "cliente":{
+                "usuario":{
+                    id: true,
+                    nome: true,
+                    email: true
+                }
+            }},
+        relations:{
+            cliente: {usuario: true},
+            status: true,
+            prioridade: true,
+            tema: true
+        },
+        where: {atendente: {id: atendente.id}}
+    })
 }
 
 export async function buscarChamadosComInformacoesCli() {
