@@ -4,16 +4,15 @@ import { Request, Response } from 'express';
 import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { buscarChamadosAtendente, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { andamentoChamado, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados, finalizarChamado } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
-import { buscarMensagens } from "./services/mensagemService";
+import { buscarMensagens, enviarMensagem } from "./services/mensagemService";
 import Atendente from "./entities/atendente.entity";
 import { buscarTodosAtendentes, criarAtendente } from "./services/atendenteService";
 import { buscarTodosAdministradores, criarAdministrador } from "./services/administradorService";
 import jwt from 'jsonwebtoken';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from "./middlewares/authenticate";
-import { getRepository } from "typeorm";
 
 const express = require('express');
 const app = express();
@@ -22,6 +21,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 AppDataSource.initialize()
     .then(() => {
@@ -83,8 +83,8 @@ app.get('/chamados', authenticate, authorize(['Administrador']), async (req: Req
 // Rota para obter chamados (atendente)
 app.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Request, res: Response) => {
     try {
-        const chamadosComInformacoes = await buscarChamadosComInformacoes();
-        res.json(chamadosComInformacoes);
+        const chamadosAte = await buscarChamadosComInformacoes();
+        res.json(chamadosAte);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Erro ao obter os chamados' });
@@ -219,6 +219,42 @@ app.get('/usuarios/:id', authenticate, authorize(['Administrador', 'Atendente'])
         res.status(500).json({ message: 'Erro ao buscar o usuário' });
     }
 });
+
+// Rota para enviar mensagens no chamado
+app.post('/chamado/enviarMensagem', async (req: Request, res: Response) => {
+    try{        
+        const { texto, idChamado, idUsuario, tipoUsuario } = req.body;
+        const chamado = await enviarMensagem(texto, idChamado, idUsuario, tipoUsuario);
+        res.json(chamado);
+    }catch(error){
+        console.error(error);
+        res.status(500).json({message: 'Erro ao enviar mensagem no chamado'})
+    }
+  })
+
+// Rota para finalizar (cancelar/concluir) chamado
+  app.put('/chamado/finalizarChamado', async (req: Request, res: Response) => {
+    try{        
+        const { idChamado, idStatus } = req.body;
+        const chamado = await finalizarChamado(idChamado, idStatus);
+        res.json(chamado);
+    }catch(error){
+        console.error(error);
+        res.status(500).json({message: 'Erro ao finalizar chamado'})
+    }
+  })
+
+  // Rota para aterar status para Em Andamento
+  app.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
+    try{        
+        const { idChamado } = req.body;
+        const chamado = await andamentoChamado(idChamado);
+        res.json(chamado);
+    }catch(error){
+        console.error(error);
+        res.status(500).json({message: 'Erro ao finalizar chamado'})
+    }
+  })
 
 const PORT = process.env.PORT || 5000;
 
