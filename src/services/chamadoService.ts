@@ -12,6 +12,7 @@ import bodyParser from 'body-parser';
 import { Request } from 'express';
 import { buscarUsuario } from "./usuarioService";
 import { buscarClientePorUserId } from "./clienteService";
+import { enviarMensagem } from "./mensagemService";
 
 const chamadoRepository = AppDataSource.getRepository(Chamado)
 const statusRepository = AppDataSource.getRepository(Status)
@@ -45,7 +46,9 @@ export async function criarChamado(req: Request) {
       
       console.log(`idTema recebido: ${idTema}`);
       
-      return chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade));
+      let chamado = await chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade));
+      enviarMensagem(desc,chamado.id,req.body.userId,'Cliente')
+      return chamado
     } catch (error) {
       console.error(error);
       throw new Error('Erro ao criar chamado');

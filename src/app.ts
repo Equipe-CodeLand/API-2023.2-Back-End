@@ -69,13 +69,13 @@ app.post('/login', async (req, res) => {
   });
 
 // atribuir atendente
-        app.post('http://localhost:5000/atribuirAtendente/', async (req: Request, res: Response) => {
-            atribuirAtendente(req.body.chamadoId, req.body.atendenteId).then(() => {
-                res.send('Atendente atribuido')
-            }).catch(() => {
-                res.send('erro ao atribuir atendente')
-            })
-        })
+app.post('/atribuirAtendente', async (req: Request, res: Response) => {
+    atribuirAtendente(req.body.chamadoId, req.body.atendenteId).then(() => {
+        res.send('Atendente atribuido')
+    }).catch(() => {
+        res.send('erro ao atribuir atendente')
+    })
+})
 
 // Rota para obter chamados (administrador)
 app.get('/chamados', authenticate, authorize(['Administrador']), async (req: Request, res: Response) => {
@@ -108,6 +108,12 @@ app.get('/atendenteChamados/:userId', (req, res) => {
             console.log(error)
             res.status(500).json({ message: 'Erro ao obter os chamados' });
         })
+})
+
+
+app.get('/atendentes', async (req, res)=>{
+    const atendentes = await buscarAtendentes()
+    res.json(atendentes)
 })
         
 // Rota para obter chamados (cliente)
