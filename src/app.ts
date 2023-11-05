@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { buscarUsuario, buscarTodosUsuarios, cadastrarUsuario } from "./services/usuarioService";
 import Usuario from "./entities/usuario.entity";
 import { criarCliente } from "./services/clienteService";
-import buscarChamadosComInformacoes, { atribuirAtendente, andamentoChamado, buscarChamadosComInformacoesCli, criarChamado, dropdownChamados, finalizarChamado, buscarChamadosAtendente } from "./services/chamadoService";
+import buscarChamadosComInformacoes, { atribuirAtendente, andamentoChamado, criarChamado, dropdownChamados, finalizarChamado, buscarChamadosAtendente, buscarChamadosCliente } from "./services/chamadoService";
 import buscarChamados from "./services/chamadoService";
 import Chamado from "./entities/chamado.entity";
 import { buscarMensagens, enviarMensagem } from "./services/mensagemService";
@@ -117,15 +117,16 @@ app.get('/atendentes', async (req, res)=>{
 })
         
 // Rota para obter chamados (cliente)
-app.get('/chamadosCli', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {
-    try {
-        const chamadosComInformacoesCli = await buscarChamadosComInformacoesCli();
-        console.log(chamadosComInformacoesCli)
-        res.json(chamadosComInformacoesCli);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao obter os chamados' });
-    }
+app.get('/chamadosCli/:userId', authenticate, authorize(['Cliente']), (req, res) => {
+    console.log(req.params.userId);
+    buscarChamadosCliente(req.params.userId)
+        .then(chamados => {
+            res.json(chamados)
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({ message: 'Erro ao obter os chamados' });
+        })
 });
 
 // Rota para obter informações de um usuário

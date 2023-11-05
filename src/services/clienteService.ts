@@ -48,7 +48,7 @@ const clienteRepository = AppDataSource.getRepository(Cliente)
     }
 }*/
 export async function buscarClientePorUserId(userId: number) {
-    return clienteRepository.findOneBy({usuario: {id: userId}})
+  return clienteRepository.findOneBy({usuario: {id: userId}});
 }
 
 export async function buscarTodosClientes() {

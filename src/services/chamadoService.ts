@@ -24,8 +24,11 @@ export async function atribuirAtendente(idChamado: number, idAtendente: number){
     let chamado = await buscarChamado(idChamado);
     let atendente = await buscarAtendente(idAtendente);
     chamado.atendente = atendente
-    return chamadoRepository.save(chamado)
-    
+    console.log(atendente);
+    console.log(chamado);
+    const salvar = await chamadoRepository.save(chamado)
+    await andamentoChamado(chamado.id)
+    return salvar
 }
 
 export async function criarChamado(req: Request) {
@@ -140,8 +143,9 @@ export async function buscarChamadosAtendente(id: number) {
     })
 }
 
-export async function buscarChamadosComInformacoesCli() {
-    const chamadosCli = await getChamadoRepository().find({
+export async function buscarChamadosCliente(id: number) {
+    let cliente = await buscarClientePorUserId(id)
+    return chamadoRepository.find({
         select:{
             "id":true,
             "tema":{
@@ -159,15 +163,16 @@ export async function buscarChamadosComInformacoesCli() {
                 "usuario":{
                     id: true,
                     nome: true,
+                    email: true
                 }
             }},
         relations:{
             atendente: {usuario: true},
             status: true,
-            tema: true,
-        }
-    });
-    return chamadosCli;
+            tema: true
+        },
+        where: {cliente: {id: cliente.id}}
+    })
 }
 
 export async function definirPrioridade(tema: Tema) {
