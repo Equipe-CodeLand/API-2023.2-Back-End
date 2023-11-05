@@ -10,6 +10,7 @@
     <img src="https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white&color=e60023"/>
     <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white&color=e60023"/>
     <img src="https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white&color=e60023"/>
+    <img src="https://img.shields.io/badge/TypeORM-007ACC?style=for-the-badge&logoColor=white&color=e60023"/>
 </p>
 
  <h3>⚙️ Execução do Sistema</h3>
