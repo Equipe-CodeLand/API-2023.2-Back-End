@@ -4,7 +4,7 @@ const db = require("../config/database.ts");
     var sql = "SELECT * FROM atendente";
 
     return con.promise().query(sql);
-}*/
+}
 export async function pegarChamado(){
     let sql = `select user_nome,user_sobrenome,cha_tema,sta_nome,pri_nome,cha_inicio,user_email,cha_desc from usuario u
 	inner join cliente cl on u.user_id = cl.user_id
@@ -25,4 +25,4 @@ export async function buscarChamadosPorAtendente(id: string) {
     where ac.ate_id = ${id}`
     let resultado = await db.connect.promise().query(sql)
     return resultado[0]
-}
+}*/
