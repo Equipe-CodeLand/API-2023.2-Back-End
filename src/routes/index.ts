@@ -8,7 +8,7 @@ import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
 import { buscarUsuario, cadastrarUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
-import { chamadosPorPrioridade, chamadosPorTema } from '../services/relatorioService';
+import { chamadosPorPrioridade, chamadosPorTema, chamadosPorTurno } from '../services/relatorioService';
 
 const qs = require('qs');
 
@@ -258,6 +258,15 @@ router.get('/relatorios/chamadosPorTema', (req, res) => {
 router.get('/relatorios/chamadosPorPrioridade', (req, res) => {
     const qst = qs.parse(req.query)
     chamadosPorPrioridade(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por turnos em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorTurno', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorTurno(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
         .then(dados => res.json(dados))
         .catch(error => res.status(500).send(error))
 })

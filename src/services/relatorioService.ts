@@ -42,7 +42,7 @@ const prioridadeRepository = AppDataSource.getRepository(Prioridade)
 export async function chamadosPorTema(inicio: Date, final: Date) {
     const temas = await temaRepository.find()
 
-    let dados = temas.map(async (tema) => {
+    return Promise.all(temas.map(async (tema) => {
         return {
             tema: tema,
             numeroChamados: await chamadoRepository.count({
@@ -52,16 +52,37 @@ export async function chamadosPorTema(inicio: Date, final: Date) {
                 }
             })
         }
-    })
-
-    return Promise.all(dados)
+    }))
 }
 
-// mesma coisa mas muda de tema para prioridade
+/*
+[
+    {
+        "prioridade": {
+            "nome": "Alta",
+            "id": 1
+        },
+        "numeroChamados": 2
+    },
+    {
+        "prioridade": {
+            "nome": "Média",
+            "id": 2
+        },
+        "numeroChamados": 1
+    },
+    {
+        "prioridade": {
+            "nome": "Baixa",
+            "id": 3
+        },
+        "numeroChamados": 1
+    }
+] */
 export async function chamadosPorPrioridade(inicio: Date, final: Date) {
     const prioridades = await prioridadeRepository.find()
 
-    let dados = prioridades.map(async (pri) => {
+    return Promise.all(prioridades.map(async (pri) => {
         return {
             prioridade: pri,
             numeroChamados: await chamadoRepository.count({
@@ -71,7 +92,43 @@ export async function chamadosPorPrioridade(inicio: Date, final: Date) {
                 }
             })
         }
-    })
+    }))
+}
 
-    return Promise.all(dados)
+/*
+[
+    {
+        "turno": "Manhã",
+        "numeroChamados": 0
+    },
+    {
+        "turno": "Tarde",
+        "numeroChamados": 3
+    },
+    {
+        "turno": "Noite",
+        "numeroChamados": 1
+    },
+    {
+        "turno": "Madrugada",
+        "numeroChamados": 0
+    }
+] */
+export async function chamadosPorTurno(inicio: Date, final: Date) {
+    const turnos = [
+        {nome: 'Manhã', inicio: '06:00:00', fim: '11:59:59'},
+        {nome: 'Tarde', inicio: '12:00:00', fim: '17:59:59'},
+        {nome: 'Noite', inicio: '18:00:00', fim: '23:59:59'},
+        {nome: 'Madrugada', inicio: '00:00:00', fim: '05:59:59'}
+    ]
+    return Promise.all(turnos.map(async turno => {
+        return {
+            turno: turno.nome,
+            numeroChamados: await chamadoRepository.createQueryBuilder('chamado')
+            .where('chamado.inicio BETWEEN :inicio AND :final', {inicio: inicio, final: final})
+            .andWhere(`TIME(chamado.inicio) BETWEEN TIME(:turnoInicio) AND TIME(:turnoFim)`,
+                {turnoInicio: turno.inicio, turnoFim: turno.fim})
+            .getCount()
+        }
+    }))
 }
