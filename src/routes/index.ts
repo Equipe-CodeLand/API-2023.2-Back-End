@@ -137,7 +137,7 @@ router.post('/usuarios', authenticate, authorize(['Administrador']), async (req:
 router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
     try {                
         // Verifique se o usuário já existe
-        const usuarioExistente = await checkUsuario(req.body.cpf);
+        const usuarioExistente = await checkUsuario(req.body.cpf, req.body.email);
 
         if (usuarioExistente) {
             // Se o usuário já existir, retorne um erro
@@ -155,7 +155,7 @@ router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
 
   router.post('/cadastro/atendente',async (req,res)=>{
     try{
-        const usuarioExistente = await checkUsuario(req.body.cpf);
+        const usuarioExistente = await checkUsuario(req.body.cpf, req.body.email);
         if(usuarioExistente){
             res.json({message: 'Usuário já existe'})
         } else{
@@ -172,7 +172,7 @@ router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
   // Rota para criar administrador
   router.post('/cadastro/administrador', async (req,res)=>{
     try{
-        const usuarioExistente = await checkUsuario(req.body.cpf);
+        const usuarioExistente = await checkUsuario(req.body.cpf, req.body.email);
         if (usuarioExistente){
             res.json({message:'Administrador já existe'})
         }else{
