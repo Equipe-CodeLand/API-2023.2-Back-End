@@ -8,7 +8,7 @@ import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
 import { buscarUsuario, cadastrarUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
-import { chamadosPorPrioridade, chamadosPorTema, chamadosPorTurno } from '../services/relatorioService';
+import { chamadosPorPrioridade, chamadosPorTema, chamadosPorTurno, tempoMedioChamados } from '../services/relatorioService';
 
 const qs = require('qs');
 
@@ -267,6 +267,13 @@ router.get('/relatorios/chamadosPorPrioridade', (req, res) => {
 router.get('/relatorios/chamadosPorTurno', (req, res) => {
     const qst = qs.parse(req.query)
     chamadosPorTurno(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+router.get('/relatorios/tempoMedio', (req, res) => {
+    const qst = qs.parse(req.query)
+    tempoMedioChamados(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
         .then(dados => res.json(dados))
         .catch(error => res.status(500).send(error))
 })

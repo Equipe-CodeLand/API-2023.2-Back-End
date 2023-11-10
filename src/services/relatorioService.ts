@@ -132,3 +132,15 @@ export async function chamadosPorTurno(inicio: Date, final: Date) {
         }
     }))
 }
+
+export async function tempoMedioChamados(inicio: Date, final: Date) {
+    const media = await chamadoRepository
+        .createQueryBuilder('chamado')
+        .select('AVG(TIMESTAMPDIFF(MINUTE, chamado.inicio, chamado.final)) AS media')
+        .where('chamado.inicio BETWEEN :inicio AND :final', {inicio: inicio, final: final})
+        .andWhere('chamado.final IS NOT NULL')        
+        .getRawOne()
+
+    const mediaMinutos = parseInt(media.media)
+    return `horas: ${mediaMinutos/60}, minutos: ${mediaMinutos%60}`
+}
