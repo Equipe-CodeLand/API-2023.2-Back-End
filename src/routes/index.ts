@@ -5,7 +5,7 @@ import Usuario from '../entities/usuario.entity';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from '../middlewares/authenticate';
 import buscarChamadosComInformacoes, { andamentoChamado, atribuirAtendente, buscarChamadosAtendente, buscarChamadosCliente, criarChamado, dropdownChamados, finalizarChamado } from '../services/chamadoService';
 import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
-import { buscarUsuario, cadastrarUsuario } from '../services/usuarioService';
+import { buscarUsuario, cadastrarUsuario, checkUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
  
@@ -136,24 +136,33 @@ router.post('/usuarios', authenticate, authorize(['Administrador']), async (req:
 // Rota para cadastro do cliente (formulário)
 router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
     try {                
-        // Crie um novo objeto de Usuario com os dados do corpo da requisição
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-    
-        // Chame a função criarCliente passando o novo usuário
-        const clienteCriado = await criarCliente(novoUsuario);
-    
-        // Retorne a resposta para o cliente
-        res.json(clienteCriado);
-      } catch (error) {
+        // Verifique se o usuário já existe
+        const usuarioExistente = await checkUsuario(req.body.cpf);
+
+        if (usuarioExistente) {
+            // Se o usuário já existir, retorne um erro
+            res.json({ message: 'Usuário já existe' });
+        } else {
+            // Se o usuário não existir, crie um novo usuário
+            const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+            const clienteCriado = await criarCliente(novoUsuario);
+            res.json(clienteCriado);
+        }
+    } catch (error) {
         res.status(500).json({ message: 'Erro ao criar cliente' });
-      }
-  })
+    }
+})
 
   router.post('/cadastro/atendente',async (req,res)=>{
     try{
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-        const atendenteCriado = await criarAtendente(req.body.turno, novoUsuario);
-        res.json(atendenteCriado)
+        const usuarioExistente = await checkUsuario(req.body.cpf);
+        if(usuarioExistente){
+            res.json({message: 'Usuário já existe'})
+        } else{
+            const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+            const atendenteCriado = await criarAtendente(req.body.turno, novoUsuario);
+            res.json(atendenteCriado)
+        }
     }catch(error){
         res.status(500).json({ message: 'Erro ao criar atendente' });
     }
@@ -163,9 +172,14 @@ router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
   // Rota para criar administrador
   router.post('/cadastro/administrador', async (req,res)=>{
     try{
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-        const adminCriado = await criarAdministrador(novoUsuario);
-        res.json(adminCriado)
+        const usuarioExistente = await checkUsuario(req.body.cpf);
+        if (usuarioExistente){
+            res.json({message:'Administrador já existe'})
+        }else{
+            const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+            const adminCriado = await criarAdministrador(novoUsuario);
+            res.json(adminCriado)
+        }
     }catch(error){
         res.status(500).json({mesaage: 'Erro ao criar o administrador'})
     }
