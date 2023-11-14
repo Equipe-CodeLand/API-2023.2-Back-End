@@ -41,6 +41,7 @@ const prioridadeRepository = AppDataSource.getRepository(Prioridade)
 ]  */
 export async function chamadosPorTema(inicio: Date, final: Date) {
     const temas = await temaRepository.find()
+    
 
     return Promise.all(temas.map(async (tema) => {
         return {
@@ -50,7 +51,8 @@ export async function chamadosPorTema(inicio: Date, final: Date) {
                     tema: {id: tema.id},
                     inicio: Between(inicio, final)
                 }
-            })
+            }),
+            tempoMedio: await tempoMedio('chamado.tema.id = :id', tema.id, inicio, final)
         }
     }))
 }
@@ -90,7 +92,8 @@ export async function chamadosPorPrioridade(inicio: Date, final: Date) {
                     prioridade: {id: pri.id},
                     inicio: Between(inicio, final)
                 }
-            })
+            }),
+            tempoMedio: await tempoMedio('chamado.prioridade.id = :id', pri.id, inicio, final)
         }
     }))
 }
@@ -142,5 +145,20 @@ export async function tempoMedioChamados(inicio: Date, final: Date) {
         .getRawOne()
 
     const mediaMinutos = parseInt(media.media)
-    return `horas: ${mediaMinutos/60}, minutos: ${mediaMinutos%60}`
+    const horas = Math.floor(mediaMinutos/60)
+    return {horas: horas, minutos: mediaMinutos%60}
+}
+
+let tempoMedio = async (where: string, id: number, inicio: Date, final: Date) => {
+    const media = await chamadoRepository
+        .createQueryBuilder('chamado')
+        .select('AVG(TIMESTAMPDIFF(MINUTE, chamado.inicio, chamado.final)) AS media')
+        .where('chamado.inicio BETWEEN :inicio AND :final', {inicio: inicio, final: final})
+        .andWhere('chamado.final IS NOT NULL')   
+        .andWhere(where, {id: id})     
+        .getRawOne()
+
+    const mediaMinutos = parseInt(media.media)
+    const horas = Math.floor(mediaMinutos/60)
+    return {horas: horas, minutos: mediaMinutos%60}
 }
