@@ -8,7 +8,7 @@ import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
 import { buscarUsuario, cadastrarUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
-import { chamadosPorPrioridade, chamadosPorTema, chamadosPorTurno, tempoMedioChamados } from '../services/relatorioService';
+import { chamadosPorPrioridade, chamadosPorStatus, chamadosPorTema, chamadosPorTurno, tempoMedioTotal } from '../services/relatorioService';
 
 const qs = require('qs');
 
@@ -152,27 +152,28 @@ router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
       }
   })
 
-  router.post('/cadastro/atendente',async (req,res)=>{
-    try{
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-        const atendenteCriado = await criarAtendente(req.body.turno, novoUsuario);
-        res.json(atendenteCriado)
-    }catch(error){
-        res.status(500).json({ message: 'Erro ao criar atendente' });
-    }
-  })
+router.post('/cadastro/atendente',async (req,res)=>{
+try{
+    const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+    const atendenteCriado = await criarAtendente(req.body.turno, novoUsuario);
+    res.json(atendenteCriado)
+}catch(error){
+    res.status(500).json({ message: 'Erro ao criar atendente' });
+}
+})
 
 
-  // Rota para criar administrador
-  router.post('/cadastro/administrador', async (req,res)=>{
-    try{
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-        const adminCriado = await criarAdministrador(novoUsuario);
-        res.json(adminCriado)
-    }catch(error){
-        res.status(500).json({mesaage: 'Erro ao criar o administrador'})
-    }
-  })
+// Rota para criar administrador
+router.post('/cadastro/administrador', async (req,res)=>{
+try{
+    const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+    const adminCriado = await criarAdministrador(novoUsuario);
+    res.json(adminCriado)
+}catch(error){
+    res.status(500).json({mesaage: 'Erro ao criar o administrador'})
+}
+})
+
 // Rota para criar um chamado
 router.post('/criarChamados', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {
     try {
@@ -231,17 +232,17 @@ router.post('/chamado/enviarMensagem', async (req: Request, res: Response) => {
     }
   })
 
-  // Rota para aterar status para Em Andamento
-  router.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
-    try{        
-        const { idChamado } = req.body;
-        const chamado = await andamentoChamado(idChamado);
-        res.json(chamado);
-    }catch(error){
-        console.error(error);
-        res.status(500).json({message: 'Erro ao finalizar chamado'})
-    }
-  })
+// Rota para aterar status para Em Andamento
+router.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
+try{        
+    const { idChamado } = req.body;
+    const chamado = await andamentoChamado(idChamado);
+    res.json(chamado);
+}catch(error){
+    console.error(error);
+    res.status(500).json({message: 'Erro ao finalizar chamado'})
+}
+})
 
 
 /*  Rota para buscar numero de chamados por tema em determinado periodo
@@ -249,6 +250,15 @@ router.post('/chamado/enviarMensagem', async (req: Request, res: Response) => {
 router.get('/relatorios/chamadosPorTema', (req, res) => {
     const qst = qs.parse(req.query)
     chamadosPorTema(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por prioridade em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorStatus', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorStatus(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
         .then(dados => res.json(dados))
         .catch(error => res.status(500).send(error))
 })
@@ -271,9 +281,9 @@ router.get('/relatorios/chamadosPorTurno', (req, res) => {
         .catch(error => res.status(500).send(error))
 })
 
-router.get('/relatorios/tempoMedio', (req, res) => {
+router.get('/relatorios/tempoMedioTotal', (req, res) => {
     const qst = qs.parse(req.query)
-    tempoMedioChamados(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+    tempoMedioTotal(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
         .then(dados => res.json(dados))
         .catch(error => res.status(500).send(error))
 })
