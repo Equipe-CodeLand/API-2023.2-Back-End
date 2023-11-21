@@ -182,11 +182,11 @@ export async function atualizarPrioridade(chamada: Chamado) {
     const agora = new Date();
     const tempoDecorrido = Math.floor((agora.getTime() - chamada.inicio.getTime()) / 60000); // tempo decorrido em minutos
 
-    if (tempoDecorrido >= 3) {
+    if (tempoDecorrido >= 3 && chamada.prioridade.id > 1) {
         chamada.prioridade = await prioridadeRepository.findOneBy({id:1}); // Alta
-    } else if (tempoDecorrido >= 2) {
+    } else if (tempoDecorrido >= 2 && chamada.prioridade.id > 2) {
         chamada.prioridade = await prioridadeRepository.findOneBy({id:2}); // Média
-    } else {
+    } else if (chamada.prioridade.id > 3) {
         chamada.prioridade = await prioridadeRepository.findOneBy({id:3}); // Baixa
     }
 
