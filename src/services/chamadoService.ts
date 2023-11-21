@@ -159,7 +159,7 @@ export async function buscarChamadosAtendente(id: number,tema:Array<any>,status:
 }
 
 export async function buscarChamadosCliente(id: number,tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
-    let cliente = await buscarClientePorUserId(id)
+    let cliente = await buscarClientePorUserId(id)    
     return chamadoRepository.find({
         select:{
             "id":true,

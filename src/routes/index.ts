@@ -102,7 +102,7 @@ router.get('/chamadosAte/:tema/:status/:prioridade', authenticate, authorize(['A
     }
 });
 
-router.get('/atendenteChamados/:userId/:tema/:status/:prioridade', (req, res) => {
+router.get('/atendenteChamados/:userId/:tema/:status/:prioridade', authenticate, authorize(['Atendente']), (req, res) => {
     const { tema, status, prioridade } = req.params;
 
     const parseParam = (param: string | undefined) => {
@@ -113,8 +113,9 @@ router.get('/atendenteChamados/:userId/:tema/:status/:prioridade', (req, res) =>
     const temaArray = parseParam(tema);
     const statusArray = parseParam(status);
     const prioridadeArray = parseParam(prioridade);
+    const userId = parseInt(req.params.userId)
     
-    buscarChamadosAtendente(req.body.userId,temaArray,statusArray,prioridadeArray)
+    buscarChamadosAtendente(userId,temaArray,statusArray,prioridadeArray)
         .then(chamados => {
             res.json(chamados)
         })
@@ -142,9 +143,9 @@ router.get('/chamadosCli/:userId/:tema/:status/:prioridade', authenticate, autho
     const temaArray = parseParam(tema);
     const statusArray = parseParam(status);
     const prioridadeArray = parseParam(prioridade);
-
-    console.log(req.body.userId);
-    buscarChamadosCliente(req.body.userId,temaArray,statusArray,prioridadeArray)
+    const userId = parseInt(req.params.userId)
+    console.log(userId);
+    buscarChamadosCliente(userId,temaArray,statusArray,prioridadeArray)
         .then(chamados => {
             res.json(chamados)
         })
