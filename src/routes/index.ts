@@ -62,9 +62,20 @@ router.post('/atribuirAtendente', async (req: Request, res: Response) => {
 })
 
 // Rota para obter chamados (administrador)
-router.get('/chamados', authenticate, authorize(['Administrador']), async (req: Request, res: Response) => {
+router.get('/chamados/:tema/:status/:prioridade', authenticate, authorize(['Administrador']), async (req: Request, res: Response) => {
     try {
-        const chamadosComInformacoes = await buscarChamadosComInformacoes();
+        const { tema, status, prioridade } = req.params;
+
+        const parseParam = (param: string | undefined) => {
+            const paramSemNome = param?.split('=')[1];
+            return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+        };
+
+        const temaArray = parseParam(tema);
+        const statusArray = parseParam(status);
+        const prioridadeArray = parseParam(prioridade);
+
+        const chamadosComInformacoes = await buscarChamadosComInformacoes(temaArray,statusArray,prioridadeArray);
         res.json(chamadosComInformacoes);
     } catch (error) {
         console.error(error);
@@ -73,9 +84,20 @@ router.get('/chamados', authenticate, authorize(['Administrador']), async (req: 
 });
 
 // Rota para obter chamados (atendente)
-router.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Request, res: Response) => {
+router.get('/chamadosAte/:tema/:status/:prioridade', authenticate, authorize(['Atendente']), async (req: Request, res: Response) => {
     try {
-        const chamadosAte = await buscarChamadosComInformacoes();
+        const { tema, status, prioridade } = req.params;
+
+        const parseParam = (param: string | undefined) => {
+            const paramSemNome = param?.split('=')[1];
+            return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+        };
+
+        const temaArray = parseParam(tema);
+        const statusArray = parseParam(status);
+        const prioridadeArray = parseParam(prioridade);
+
+        const chamadosAte = await buscarChamadosComInformacoes(temaArray,statusArray,prioridadeArray);
         res.json(chamadosAte);
     } catch (error) {
         console.error(error);
@@ -83,8 +105,20 @@ router.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: R
     }
 });
 
-router.get('/atendenteChamados/:userId', (req, res) => {
-    buscarChamadosAtendente(req.body.userId)
+router.get('/atendenteChamados/:userId/:tema/:status/:prioridade', authenticate, authorize(['Atendente']), (req, res) => {
+    const { tema, status, prioridade } = req.params;
+
+    const parseParam = (param: string | undefined) => {
+        const paramSemNome = param?.split('=')[1];
+        return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+    };
+
+    const temaArray = parseParam(tema);
+    const statusArray = parseParam(status);
+    const prioridadeArray = parseParam(prioridade);
+    const userId = parseInt(req.params.userId)
+    
+    buscarChamadosAtendente(userId,temaArray,statusArray,prioridadeArray)
         .then(chamados => {
             res.json(chamados)
         })
@@ -101,9 +135,20 @@ router.get('/atendentes', async (req, res)=>{
 })
         
 // Rota para obter chamados (cliente)
-router.get('/chamadosCli/:userId', authenticate, authorize(['Cliente']), (req, res) => {
-    console.log(req.body.userId);
-    buscarChamadosCliente(req.body.userId)
+router.get('/chamadosCli/:userId/:tema/:status/:prioridade', authenticate, authorize(['Cliente']), (req, res) => {
+    const { tema, status, prioridade } = req.params;
+
+    const parseParam = (param: string | undefined) => {
+        const paramSemNome = param?.split('=')[1];
+        return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+    };
+
+    const temaArray = parseParam(tema);
+    const statusArray = parseParam(status);
+    const prioridadeArray = parseParam(prioridade);
+    const userId = parseInt(req.params.userId)
+    console.log(userId);
+    buscarChamadosCliente(userId,temaArray,statusArray,prioridadeArray)
         .then(chamados => {
             res.json(chamados)
         })
