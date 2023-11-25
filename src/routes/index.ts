@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, query } from 'express';
 import { buscarMensagens, enviarMensagem } from '../services/mensagemService';
 import { AppDataSource } from '../config/data-source';
 import Usuario from '../entities/usuario.entity';
@@ -8,7 +8,10 @@ import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
 import { buscarUsuario, cadastrarUsuario, checkUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
- 
+import { chamadosPorPrioridade, chamadosPorStatus, chamadosPorTema, chamadosPorTurno, tempoMedioTotal } from '../services/relatorioService';
+
+const qs = require('qs');
+
 const router = Router();
  
 // Rota para verificar se o servidor está rodando
@@ -184,6 +187,7 @@ router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
         res.status(500).json({mesaage: 'Erro ao criar o administrador'})
     }
   })
+
 // Rota para criar um chamado
 router.post('/criarChamados', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {
     try {
@@ -242,16 +246,60 @@ router.post('/chamado/enviarMensagem', async (req: Request, res: Response) => {
     }
   })
 
-  // Rota para aterar status para Em Andamento
-  router.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
-    try{        
-        const { idChamado } = req.body;
-        const chamado = await andamentoChamado(idChamado);
-        res.json(chamado);
-    }catch(error){
-        console.error(error);
-        res.status(500).json({message: 'Erro ao finalizar chamado'})
-    }
-  })
+// Rota para aterar status para Em Andamento
+router.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
+try{        
+    const { idChamado } = req.body;
+    const chamado = await andamentoChamado(idChamado);
+    res.json(chamado);
+}catch(error){
+    console.error(error);
+    res.status(500).json({message: 'Erro ao finalizar chamado'})
+}
+})
+
+
+/*  Rota para buscar numero de chamados por tema em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorTema', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorTema(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por prioridade em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorStatus', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorStatus(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por prioridade em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorPrioridade', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorPrioridade(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por turnos em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorTurno', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorTurno(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+router.get('/relatorios/tempoMedioTotal', (req, res) => {
+    const qst = qs.parse(req.query)
+    tempoMedioTotal(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
  
- export default router; 
+export default router; 
