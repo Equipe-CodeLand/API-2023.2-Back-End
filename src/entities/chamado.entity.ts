@@ -43,6 +43,7 @@ export default class Chamado {
 
     @OneToMany(() => Mensagem, (mensagem) => mensagem.chamado)
     public mensagens: Mensagem[];
+    dataCriacao: any;
 
     constructor(tema: Tema, desc: string, cliente: Cliente, status: Status, prioridade: Prioridade) {
         this.tema = tema

@@ -3,11 +3,15 @@ import { buscarMensagens, enviarMensagem } from '../services/mensagemService';
 import { AppDataSource } from '../config/data-source';
 import Usuario from '../entities/usuario.entity';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from '../middlewares/authenticate';
-import buscarChamadosComInformacoes, { andamentoChamado, atribuirAtendente, buscarChamadosAtendente, buscarChamadosCliente, criarChamado, dropdownChamados, finalizarChamado } from '../services/chamadoService';
+import buscarChamadosComInformacoes, { andamentoChamado, atribuirAtendente, atualizarPrioridade, buscarChamadosAtendente, buscarChamadosCliente, criarChamado, definirPrioridade, dropdownChamados, finalizarChamado } from '../services/chamadoService';
 import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
+import { buscarClientePorUserId, criarCliente } from '../services/clienteService';
+import { criarAdministrador } from '../services/administradorService';
+import Chamado from '../entities/chamado.entity';
+import Status from '../entities/status.entity';
+import Tema from '../entities/tema.entity';
 import { buscarUsuario, cadastrarUsuario, checkUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
-import { criarAdministrador } from '../services/administradorService';
 import { chamadosPorPrioridade, chamadosPorStatus, chamadosPorTema, chamadosPorTurno, tempoMedioTotal } from '../services/relatorioService';
 
 const qs = require('qs');
@@ -76,6 +80,9 @@ router.get('/chamados/:tema/:status/:prioridade', authenticate, authorize(['Admi
         const prioridadeArray = parseParam(prioridade);
 
         const chamadosComInformacoes = await buscarChamadosComInformacoes(temaArray,statusArray,prioridadeArray);
+        chamadosComInformacoes.forEach(async chamado => {
+              await atualizarPrioridade(chamado)
+          })
         res.json(chamadosComInformacoes);
     } catch (error) {
         console.error(error);
@@ -291,17 +298,52 @@ router.post('/chamado/enviarMensagem', async (req: Request, res: Response) => {
     }
   })
 
-// Rota para aterar status para Em Andamento
-router.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
-try{        
-    const { idChamado } = req.body;
-    const chamado = await andamentoChamado(idChamado);
-    res.json(chamado);
-}catch(error){
-    console.error(error);
-    res.status(500).json({message: 'Erro ao finalizar chamado'})
+  // Rota para criar um chamado
+router.post('/alterarPrioridade', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {
+    try {
+        const cliente = await buscarClientePorUserId(req.body.userId)
+        const idTema = parseInt(req.body.idTema);
+        const desc = req.body.desc;
+        
+        
+        const statusRepository = AppDataSource.getRepository(Status);
+        const status = await statusRepository.findOneBy({ id: 1 });
+        const temaRepository = AppDataSource.getRepository(Tema);
+        const tema = await temaRepository.findOneBy({ id: idTema });
+        const prioridade = await definirPrioridade(tema);
+
+        const chamadoRepository = AppDataSource.getRepository(Chamado);
+        const chamado = await chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade));
+
+        // Adicionando a lógica de atualização de status
+        await atualizarStatusChamado(chamado);
+
+        enviarMensagem(desc, chamado.id, req.body.userId, 'Cliente');
+        
+        res.json(chamado);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao criar o chamado' });
+    }
+});
+
+
+  // Rota para aterar status para Em Andamento
+  router.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
+    try{        
+        const { idChamado } = req.body;
+        const chamado = await andamentoChamado(idChamado);
+        res.json(chamado);
+    }catch(error){
+        console.error(error);
+        res.status(500).json({message: 'Erro ao finalizar chamado'})
+    }
+  })
+ 
+
+function atualizarStatusChamado(chamado: any) {
+    throw new Error('Function not implemented.');
 }
-})
 
 
 /*  Rota para buscar numero de chamados por tema em determinado periodo
