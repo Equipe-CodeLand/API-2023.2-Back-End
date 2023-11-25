@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { In, getRepository } from "typeorm";
 import { AppDataSource, getChamadoRepository } from "../config/data-source";
 import Chamado from "../entities/chamado.entity";
 import Prioridade from "../entities/prioridade.entity";
@@ -72,7 +72,7 @@ async function buscarTodosChamados() {
         throw new Error(`Erro ao buscar chamados: ${error.message}`);
     }
 }
-async function buscarChamadosComInformacoes() {
+async function buscarChamadosComInformacoes(tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
     const chamados = await getChamadoRepository().find({
         select:{
             "id":true,
@@ -103,12 +103,20 @@ async function buscarChamadosComInformacoes() {
             status: true,
             prioridade: true,
             tema: true
+        },
+        where: {
+            tema: tema.length > 0 ? { id: In(tema) } : undefined,
+            status: status.length > 0 ? { id: In(status) } : undefined,
+            prioridade: prioridade.length > 0 ? { id: In(prioridade) } : undefined
+        },
+        order: {
+            inicio: 'ASC'
         }
     });
     return chamados;
 }
 
-export async function buscarChamadosAtendente(id: number) {
+export async function buscarChamadosAtendente(id: number,tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
     let atendente = await buscarAtendentePorUserId(id)
     return chamadoRepository.find({
         select:{
@@ -141,12 +149,19 @@ export async function buscarChamadosAtendente(id: number) {
             prioridade: true,
             tema: true
         },
-        where: {atendente: {id: atendente.id}}
+        where: {atendente: {id: atendente.id},
+        tema: tema.length > 0 ? { id: In(tema) } : undefined,
+        status: status.length > 0 ? { id: In(status) } : undefined,
+        prioridade: prioridade.length > 0 ? { id: In(prioridade) } : undefined
+    },
+    order: {
+        inicio: 'ASC'
+    }
     })
 }
 
-export async function buscarChamadosCliente(id: number) {
-    let cliente = await buscarClientePorUserId(id)
+export async function buscarChamadosCliente(id: number,tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
+    let cliente = await buscarClientePorUserId(id)    
     return chamadoRepository.find({
         select:{
             "id":true,
@@ -173,7 +188,14 @@ export async function buscarChamadosCliente(id: number) {
             status: true,
             tema: true
         },
-        where: {cliente: {id: cliente.id}}
+        where: {cliente: {id: cliente.id},
+        tema: tema.length > 0 ? { id: In(tema) } : undefined,
+        status: status.length > 0 ? { id: In(status) } : undefined,
+        prioridade: prioridade.length > 0 ? { id: In(prioridade) } : undefined
+    },
+    order: {
+        inicio: 'ASC'
+    }
     })
 }
 

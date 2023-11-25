@@ -1,17 +1,21 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, query } from 'express';
 import { buscarMensagens, enviarMensagem } from '../services/mensagemService';
 import { AppDataSource } from '../config/data-source';
 import Usuario from '../entities/usuario.entity';
 import { authenticate, authorize, generateAuthToken, getUserRoles } from '../middlewares/authenticate';
 import buscarChamadosComInformacoes, { andamentoChamado, atribuirAtendente, atualizarPrioridade, buscarChamadosAtendente, buscarChamadosCliente, criarChamado, definirPrioridade, dropdownChamados, finalizarChamado } from '../services/chamadoService';
 import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
-import { buscarUsuario, cadastrarUsuario } from '../services/usuarioService';
 import { buscarClientePorUserId, criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
 import Chamado from '../entities/chamado.entity';
 import Status from '../entities/status.entity';
 import Tema from '../entities/tema.entity';
- 
+import { buscarUsuario, cadastrarUsuario, checkUsuario } from '../services/usuarioService';
+import { criarCliente } from '../services/clienteService';
+import { chamadosPorPrioridade, chamadosPorStatus, chamadosPorTema, chamadosPorTurno, tempoMedioTotal } from '../services/relatorioService';
+
+const qs = require('qs');
+
 const router = Router();
  
 // Rota para verificar se o servidor está rodando
@@ -62,13 +66,23 @@ router.post('/atribuirAtendente', async (req: Request, res: Response) => {
 })
 
 // Rota para obter chamados (administrador)
-router.get('/chamados', authenticate, authorize(['Administrador']), async (req: Request, res: Response) => {
+router.get('/chamados/:tema/:status/:prioridade', authenticate, authorize(['Administrador']), async (req: Request, res: Response) => {
     try {
-        const chamadosComInformacoes = await buscarChamadosComInformacoes();
+        const { tema, status, prioridade } = req.params;
 
+        const parseParam = (param: string | undefined) => {
+            const paramSemNome = param?.split('=')[1];
+            return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+        };
+
+        const temaArray = parseParam(tema);
+        const statusArray = parseParam(status);
+        const prioridadeArray = parseParam(prioridade);
+
+        const chamadosComInformacoes = await buscarChamadosComInformacoes(temaArray,statusArray,prioridadeArray);
         chamadosComInformacoes.forEach(async chamado => {
-            await atualizarPrioridade(chamado)
-        })
+              await atualizarPrioridade(chamado)
+          })
         res.json(chamadosComInformacoes);
     } catch (error) {
         console.error(error);
@@ -77,9 +91,20 @@ router.get('/chamados', authenticate, authorize(['Administrador']), async (req: 
 });
 
 // Rota para obter chamados (atendente)
-router.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: Request, res: Response) => {
+router.get('/chamadosAte/:tema/:status/:prioridade', authenticate, authorize(['Atendente']), async (req: Request, res: Response) => {
     try {
-        const chamadosAte = await buscarChamadosComInformacoes();
+        const { tema, status, prioridade } = req.params;
+
+        const parseParam = (param: string | undefined) => {
+            const paramSemNome = param?.split('=')[1];
+            return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+        };
+
+        const temaArray = parseParam(tema);
+        const statusArray = parseParam(status);
+        const prioridadeArray = parseParam(prioridade);
+
+        const chamadosAte = await buscarChamadosComInformacoes(temaArray,statusArray,prioridadeArray);
         res.json(chamadosAte);
     } catch (error) {
         console.error(error);
@@ -87,8 +112,20 @@ router.get('/chamadosAte', authenticate, authorize(['Atendente']), async (req: R
     }
 });
 
-router.get('/atendenteChamados/:userId', (req, res) => {
-    buscarChamadosAtendente(req.body.userId)
+router.get('/atendenteChamados/:userId/:tema/:status/:prioridade', authenticate, authorize(['Atendente']), (req, res) => {
+    const { tema, status, prioridade } = req.params;
+
+    const parseParam = (param: string | undefined) => {
+        const paramSemNome = param?.split('=')[1];
+        return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+    };
+
+    const temaArray = parseParam(tema);
+    const statusArray = parseParam(status);
+    const prioridadeArray = parseParam(prioridade);
+    const userId = parseInt(req.params.userId)
+    
+    buscarChamadosAtendente(userId,temaArray,statusArray,prioridadeArray)
         .then(chamados => {
             res.json(chamados)
         })
@@ -105,9 +142,20 @@ router.get('/atendentes', async (req, res)=>{
 })
         
 // Rota para obter chamados (cliente)
-router.get('/chamadosCli/:userId', authenticate, authorize(['Cliente']), (req, res) => {
-    console.log(req.body.userId);
-    buscarChamadosCliente(req.body.userId)
+router.get('/chamadosCli/:userId/:tema/:status/:prioridade', authenticate, authorize(['Cliente']), (req, res) => {
+    const { tema, status, prioridade } = req.params;
+
+    const parseParam = (param: string | undefined) => {
+        const paramSemNome = param?.split('=')[1];
+        return paramSemNome ? paramSemNome.split(',').map(value => Number(value.trim())) : [];
+    };
+
+    const temaArray = parseParam(tema);
+    const statusArray = parseParam(status);
+    const prioridadeArray = parseParam(prioridade);
+    const userId = parseInt(req.params.userId)
+    console.log(userId);
+    buscarChamadosCliente(userId,temaArray,statusArray,prioridadeArray)
         .then(chamados => {
             res.json(chamados)
         })
@@ -143,24 +191,33 @@ router.post('/usuarios', authenticate, authorize(['Administrador']), async (req:
 // Rota para cadastro do cliente (formulário)
 router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
     try {                
-        // Crie um novo objeto de Usuario com os dados do corpo da requisição
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-    
-        // Chame a função criarCliente passando o novo usuário
-        const clienteCriado = await criarCliente(novoUsuario);
-    
-        // Retorne a resposta para o cliente
-        res.json(clienteCriado);
-      } catch (error) {
+        // Verifique se o usuário já existe
+        const usuarioExistente = await checkUsuario(req.body.cpf, req.body.email);
+
+        if (usuarioExistente) {
+            // Se o usuário já existir, retorne um erro
+            res.json({ message: 'Usuário já existe' });
+        } else {
+            // Se o usuário não existir, crie um novo usuário
+            const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+            const clienteCriado = await criarCliente(novoUsuario);
+            res.json(clienteCriado);
+        }
+    } catch (error) {
         res.status(500).json({ message: 'Erro ao criar cliente' });
-      }
-  })
+    }
+})
 
   router.post('/cadastro/atendente',async (req,res)=>{
     try{
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-        const atendenteCriado = await criarAtendente(req.body.turno, novoUsuario);
-        res.json(atendenteCriado)
+        const usuarioExistente = await checkUsuario(req.body.cpf, req.body.email);
+        if(usuarioExistente){
+            res.json({message: 'Usuário já existe'})
+        } else{
+            const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+            const atendenteCriado = await criarAtendente(req.body.turno, novoUsuario);
+            res.json(atendenteCriado)
+        }
     }catch(error){
         res.status(500).json({ message: 'Erro ao criar atendente' });
     }
@@ -170,13 +227,19 @@ router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
   // Rota para criar administrador
   router.post('/cadastro/administrador', async (req,res)=>{
     try{
-        const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
-        const adminCriado = await criarAdministrador(novoUsuario);
-        res.json(adminCriado)
+        const usuarioExistente = await checkUsuario(req.body.cpf, req.body.email);
+        if (usuarioExistente){
+            res.json({message:'Administrador já existe'})
+        }else{
+            const novoUsuario = new Usuario(req.body.nome, req.body.sobrenome, req.body.cpf, req.body.email, req.body.telefone, req.body.senha);
+            const adminCriado = await criarAdministrador(novoUsuario);
+            res.json(adminCriado)
+        }
     }catch(error){
         res.status(500).json({mesaage: 'Erro ao criar o administrador'})
     }
   })
+
 // Rota para criar um chamado
 router.post('/criarChamados', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {
     try {
@@ -277,8 +340,53 @@ router.post('/alterarPrioridade', authenticate, authorize(['Cliente']), async (r
     }
   })
  
- export default router; 
 
 function atualizarStatusChamado(chamado: any) {
     throw new Error('Function not implemented.');
 }
+
+
+/*  Rota para buscar numero de chamados por tema em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorTema', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorTema(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por prioridade em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorStatus', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorStatus(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por prioridade em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorPrioridade', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorPrioridade(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+/*  Rota para buscar numero de chamados por turnos em determinado periodo
+    Passar datas no axios. Ex: {params: {diaInicio: 1, mesInicio: 11, anoInicio: 2023, diaFinal: 3, mesFinal: 11, anoFinal: 2023}} */
+router.get('/relatorios/chamadosPorTurno', (req, res) => {
+    const qst = qs.parse(req.query)
+    chamadosPorTurno(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+
+router.get('/relatorios/tempoMedioTotal', (req, res) => {
+    const qst = qs.parse(req.query)
+    tempoMedioTotal(new Date(qst.anoInicio, qst.mesInicio-1, qst.diaInicio), new Date(qst.anoFinal, qst.mesFinal-1, qst.diaFinal, 23, 59, 59, 999))
+        .then(dados => res.json(dados))
+        .catch(error => res.status(500).send(error))
+})
+ 
+export default router; 
