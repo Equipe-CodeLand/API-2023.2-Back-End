@@ -8,7 +8,7 @@ import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
 import { buscarUsuario, cadastrarUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
-import { buscarProblemas, deletarProblemas, enviarProblema, atualizarProblemas, atualizarSolucoes, deletarSolucoes } from '../services/problemaService';
+import { buscarProblemas, deletarProblemas, enviarProblema, atualizarProblemas, deletarSolucoes } from '../services/problemaService';
 
 const router = Router();
 
@@ -286,10 +286,11 @@ router.put('/chamado/andamentoChamado', async (req: Request, res: Response) => {
 })
 
 //Rota para criar problema e solução
-router.post('/criarProblemas', async (req: Request, res: Response) => {
+router.put('/criarProblemas', async (req: Request, res: Response) => {
     try {
         const { desc, tema_id, solucao } = req.body;
         const problema = await enviarProblema(desc, tema_id, solucao);
+        console.log(problema)
         res.json(problema);
     } catch (error) {
         console.error(error);
@@ -324,7 +325,7 @@ router.put('/atualizarProblemas/:id', async (req: Request, res: Response) => {
 })
 
 //Rota para atualizar solução
-router.put('/atualizarSolucoes/:id', async (req: Request, res: Response) => {
+/*router.put('/atualizarSolucoes/:id', async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
         const data = req.body;
@@ -336,7 +337,7 @@ router.put('/atualizarSolucoes/:id', async (req: Request, res: Response) => {
         console.error(error);
         res.status(500).json({ message: 'Erro ao atualizar a solução.' })
     }
-})
+})*/
 
 //Rota para deletar problema e solução
 router.delete('/deletarProblemas/:id', async (req: Request, res: Response) => {

@@ -17,31 +17,33 @@ interface Solucao {
     desc: string,
 }
 
-export async function enviarProblema(desc: string, tema_id: number, solucao: []) {
+export async function enviarProblema(desc: string, tema_id: number, solucaoo: string) {
     try {
-        const tema = await temaRepository.findOneBy({
-            id: tema_id
-        })
+        const tema = await temaRepository.findOneBy({ id: tema_id });
 
-        const problema = await problemaRepository.create({
+        // Criação da solução
+        const solucao = solucaoRepository.create({
+            desc: solucaoo,
+        });
+
+        const createSolution = await solucaoRepository.save(solucao);
+
+        // Criação do problema e associação da solução a ele
+        const problema = problemaRepository.create({
             desc: desc,
-            tema: tema
-        })
+            tema: tema,
+            solucao: createSolution // Associa a solução criada ao problema
+        });
 
-        const createProblem = await problemaRepository.save(problema)
+        const createProblem = await problemaRepository.save(problema);
 
-        const createSolution = await Promise.all(solucao.map(async (solu) => {
-            const solucoes = solucaoRepository.create({
-                desc: solu,
-                problema: createProblem,
-            });
+        // Associação da solução ao problema
+        createSolution.problema = createProblem;
+        await solucaoRepository.save(createSolution);
 
-            return await solucaoRepository.save(solucoes);
-        }));
-
-        return { createProblem, createSolution }
+        return { createProblem, createSolution };
     } catch (error) {
-        return error
+        return error;
     }
 }
 
@@ -51,6 +53,12 @@ export async function buscarProblemas() {
             select: {
                 "id": true,
                 "desc": true,
+                "tema": {
+                    "nome": true
+                },
+                "solucao":{
+                    "desc": true
+                }
             },
             relations: {
                 tema: true,
@@ -85,7 +93,7 @@ export async function atualizarProblemas(id: number, data: any) {
     }
 }
 
-export async function atualizarSolucoes(id: number, data: any) {
+/*export async function atualizarSolucoes(id: number, data: any) {
     try {
         const fetch = await solucaoRepository.findOneBy({
             problema: {
@@ -101,7 +109,7 @@ export async function atualizarSolucoes(id: number, data: any) {
     } catch (error) {
         return error
     }
-}
+}*/
 
 export async function deletarProblemas(id: number) {
     try {

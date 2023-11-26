@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import Tema from "./tema.entity";
 import Solucao from "./solucao.entity";
 
@@ -15,8 +15,9 @@ export default class Problema {
     @JoinColumn({name: 'tema_id'})
     public tema: Tema
 
-    @OneToMany(() => Solucao, (solucao) => solucao.problema)
-    public solucao: Solucao[];
+    @OneToOne(() => Solucao)
+    @JoinColumn({name: 'sol_id'})
+    public solucao: Solucao;
 
     constructor(desc: string, tema: Tema) {
         this.desc = desc

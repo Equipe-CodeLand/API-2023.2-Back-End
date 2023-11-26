@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import Problema from "./problema.entity";
 
 @Entity({name: 'solucao'})
@@ -10,7 +10,7 @@ export default class Solucao {
     @Column({name: 'sol_desc', length: 500})
     public desc: string
 
-    @ManyToOne(() => Problema, (problema) => problema.solucao, {onDelete: "CASCADE"})
+    @OneToOne(() => Problema, (problema) => problema.solucao)
     @JoinColumn({name: 'pro_id'})
     public problema: Problema
 
