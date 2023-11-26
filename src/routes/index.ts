@@ -8,7 +8,7 @@ import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
 import { buscarUsuario, cadastrarUsuario } from '../services/usuarioService';
 import { criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
-import { buscarProblemas, deletarProblemas, enviarProblema, atualizarProblemas, atualizarSolucoes, deletarSolucoes } from '../services/problemaService';
+import { buscarProblemas, deletarProblemas, enviarProblema, atualizarProblemas, atualizarSolucoes, deletarSolucoes, enviarSolucao, buscarProblema } from '../services/problemaService';
 
 const router = Router();
 
@@ -290,6 +290,7 @@ router.post('/criarProblemas', async (req: Request, res: Response) => {
     try {
         const { desc, tema_id, solucao } = req.body;
         const problema = await enviarProblema(desc, tema_id, solucao);
+        console.log(tema_id)
         res.json(problema);
     } catch (error) {
         console.error(error);
@@ -297,10 +298,35 @@ router.post('/criarProblemas', async (req: Request, res: Response) => {
     }
 })
 
+//Rota para adicionar mais solução
+router.post('/criarSolucoes/:id', async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const { desc } = req.body;
+        const solucao = await enviarSolucao(desc, id);
+        res.json(solucao);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao enviar solução.' })
+    }
+})
+
 //Rota para buscar problema e solução
 router.get('/buscarProblemas', async (req: Request, res: Response) => {
     try {
         const problemas = await buscarProblemas();
+        res.json(problemas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao buscar problema e solução.' })
+    }
+})
+
+//Rota para buscar um problema específico
+router.get('/buscarProblema/:id', async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const problemas = await buscarProblema(id);
         res.json(problemas);
     } catch (error) {
         console.error(error);

@@ -45,6 +45,21 @@ export async function enviarProblema(desc: string, tema_id: number, solucao: [])
     }
 }
 
+export async function enviarSolucao(desc: string, id: number) {
+    const fetch = await problemaRepository.findOneBy({
+        id: id
+    })
+
+    const create = await solucaoRepository.create({
+        desc: desc,
+        problema: fetch
+    })
+
+    await solucaoRepository.save(create)
+
+    return { create }
+}
+
 export async function buscarProblemas() {
     try {
         const problemas = await problemaRepository.find({
@@ -64,6 +79,22 @@ export async function buscarProblemas() {
     }
 }
 
+export async function buscarProblema(id: number) {
+    try {
+        const problema = await problemaRepository.findOne({
+            where: {
+                id: id,
+            },
+            relations: ["tema"],
+        })
+
+        return { problema }
+    } catch (error) {
+        return error
+    }
+}
+
+
 export async function atualizarProblemas(id: number, data: any) {
     try {
         const fetch = await problemaRepository.findOneBy({
@@ -71,7 +102,7 @@ export async function atualizarProblemas(id: number, data: any) {
         })
 
         const tema = await temaRepository.findOneBy({
-            id: data.tema_id ||fetch.tema.id
+            id: data.tema_id || fetch.tema.id
         })
 
         const problema = await problemaRepository.update(Number(id), {
@@ -88,12 +119,10 @@ export async function atualizarProblemas(id: number, data: any) {
 export async function atualizarSolucoes(id: number, data: any) {
     try {
         const fetch = await solucaoRepository.findOneBy({
-            problema: {
-                id: id
-            }
+            id: id
         })
 
-        const solucao = await solucaoRepository.update(Number(data.id), {
+        const solucao = await solucaoRepository.update(id, {
             desc: data.desc || fetch.desc,
         })
 
