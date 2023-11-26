@@ -13,6 +13,7 @@ import { Request } from 'express';
 import { buscarUsuario } from "./usuarioService";
 import { buscarClientePorUserId } from "./clienteService";
 import { enviarMensagem } from "./mensagemService";
+import { stat } from "fs";
 
 const chamadoRepository = AppDataSource.getRepository(Chamado)
 const statusRepository = AppDataSource.getRepository(Status)
@@ -204,11 +205,12 @@ export async function atualizarPrioridade(chamada: Chamado) {
     const agora = new Date();
     const tempoDecorrido = Math.floor((agora.getTime() - chamada.inicio.getTime()) / 60000); // tempo decorrido em minutos
 
-    if (tempoDecorrido >= 3 && chamada.prioridade.id > 1) {
+    const statusIdAlterar = [1,2]
+    if (tempoDecorrido >= 60 && chamada.prioridade.id > 1 && statusIdAlterar.includes(chamada.status.id)) {
         chamada.prioridade = await prioridadeRepository.findOneBy({id:1}); // Alta
-    } else if (tempoDecorrido >= 2 && chamada.prioridade.id > 2) {
+    } else if (tempoDecorrido >= 30 && chamada.prioridade.id > 2 && statusIdAlterar.includes(chamada.status.id)) {
         chamada.prioridade = await prioridadeRepository.findOneBy({id:2}); // Média
-    } else if (chamada.prioridade.id > 3) {
+    } else if (chamada.prioridade.id > 3 && statusIdAlterar.includes(chamada.status.id)) {
         chamada.prioridade = await prioridadeRepository.findOneBy({id:3}); // Baixa
     }
 
@@ -239,7 +241,7 @@ export async function andamentoChamado(idChamado: number) {
     
     chamado.status = status
 
-    await statusRepository.save(chamado)
+    await chamadoRepository.save(chamado)
 
     return chamado
 }
