@@ -12,7 +12,6 @@ import Chamado from '../entities/chamado.entity';
 import Status from '../entities/status.entity';
 import Tema from '../entities/tema.entity';
 import { buscarUsuario, cadastrarUsuario, checkUsuario } from '../services/usuarioService';
-import { criarCliente } from '../services/clienteService';
 import { chamadosPorPrioridade, chamadosPorStatus, chamadosPorTema, chamadosPorTurno, tempoMedioTotal } from '../services/relatorioService';
 
 const qs = require('qs');
