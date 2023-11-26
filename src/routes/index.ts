@@ -7,6 +7,7 @@ import buscarChamadosComInformacoes, { andamentoChamado, atribuirAtendente, atua
 import { buscarAtendentes, criarAtendente } from '../services/atendenteService';
 import { buscarClientePorUserId, criarCliente } from '../services/clienteService';
 import { criarAdministrador } from '../services/administradorService';
+import { buscarProblemas, deletarProblemas, enviarProblema, atualizarProblemas, atualizarSolucoes, deletarSolucoes, enviarSolucao, buscarProblema } from '../services/problemaService';
 import Chamado from '../entities/chamado.entity';
 import Status from '../entities/status.entity';
 import Tema from '../entities/tema.entity';
@@ -17,9 +18,9 @@ import { chamadosPorPrioridade, chamadosPorStatus, chamadosPorTema, chamadosPorT
 const qs = require('qs');
 
 const router = Router();
- 
+
 // Rota para verificar se o servidor está rodando
-router.get('/',(req, res) => {
+router.get('/', (req, res) => {
     return res.json('Back-End');
 });
 
@@ -31,7 +32,7 @@ router.get('/chamados/:id/mensagens', (req, res) => {
         .catch(error => {
             console.error(error);
             res.status(500).json({ message: 'Erro ao buscar mensagens' });
-        })    
+        })
 })
 
 // rota para autenticar usuário
@@ -39,22 +40,22 @@ router.post('/login', async (req, res) => {
     const { email, senha } = req.body;
 
     try {
-      const userRepository = AppDataSource.getRepository(Usuario);
-      const usuario = await userRepository.findOneBy({email: email})
-      const tipoUser = await getUserRoles(usuario)
+        const userRepository = AppDataSource.getRepository(Usuario);
+        const usuario = await userRepository.findOneBy({ email: email })
+        const tipoUser = await getUserRoles(usuario)
 
-      if (!usuario || usuario.senha !== senha) {
-        return res.status(401).json({ error: "Credenciais inválidas" });
-      } else {
-        const token = await generateAuthToken(usuario);
-        res.json({ token, tipoUser });
-      }
+        if (!usuario || usuario.senha !== senha) {
+            return res.status(401).json({ error: "Credenciais inválidas" });
+        } else {
+            const token = await generateAuthToken(usuario);
+            res.json({ token, tipoUser });
+        }
 
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Erro no servidor" });
+        console.error(error);
+        res.status(500).json({ error: "Erro no servidor" });
     }
-  });
+});
 
 // atribuir atendente
 router.post('/atribuirAtendente', async (req: Request, res: Response) => {
@@ -83,6 +84,7 @@ router.get('/chamados/:tema/:status/:prioridade', authenticate, authorize(['Admi
         chamadosComInformacoes.forEach(async chamado => {
               await atualizarPrioridade(chamado)
           })
+
         res.json(chamadosComInformacoes);
     } catch (error) {
         console.error(error);
@@ -104,7 +106,7 @@ router.get('/chamadosAte/:tema/:status/:prioridade', authenticate, authorize(['A
         const statusArray = parseParam(status);
         const prioridadeArray = parseParam(prioridade);
 
-        const chamadosAte = await buscarChamadosComInformacoes(temaArray,statusArray,prioridadeArray);
+        const chamadosAte = await buscarChamadosComInformacoes(temaArray, statusArray, prioridadeArray);
         res.json(chamadosAte);
     } catch (error) {
         console.error(error);
@@ -136,11 +138,11 @@ router.get('/atendenteChamados/:userId/:tema/:status/:prioridade', authenticate,
 })
 
 
-router.get('/atendentes', async (req, res)=>{
+router.get('/atendentes', async (req, res) => {
     const atendentes = await buscarAtendentes()
     res.json(atendentes)
 })
-        
+
 // Rota para obter chamados (cliente)
 router.get('/chamadosCli/:userId/:tema/:status/:prioridade', authenticate, authorize(['Cliente']), (req, res) => {
     const { tema, status, prioridade } = req.params;
@@ -166,7 +168,7 @@ router.get('/chamadosCli/:userId/:tema/:status/:prioridade', authenticate, autho
 });
 
 // Rota para obter informações de um usuário
-router.get('/usuarios/:id',async (req: Request, res: Response) => {
+router.get('/usuarios/:id', async (req: Request, res: Response) => {
     const usuarioId = parseInt(req.params.id);
     try {
         const usuario = await buscarUsuario(usuarioId);
@@ -221,7 +223,7 @@ router.post('/cadastro/cliente', async (req: Request, res: Response)=>{
     }catch(error){
         res.status(500).json({ message: 'Erro ao criar atendente' });
     }
-  })
+})
 
 
   // Rota para criar administrador
@@ -260,7 +262,7 @@ router.post('/dropdownChamados', async (req: Request, res: Response) => {
         console.error(error);
         res.status(500).send('Ocorreu um erro ao buscar e despachar os chamados');
     }
-});        
+});
 
 // Rota para obter informações de um usuário
 router.get('/usuarios/:id', authenticate, authorize(['Administrador', 'Atendente']), async (req: Request, res: Response) => {
@@ -276,27 +278,27 @@ router.get('/usuarios/:id', authenticate, authorize(['Administrador', 'Atendente
 
 // Rota para enviar mensagens no chamado
 router.post('/chamado/enviarMensagem', async (req: Request, res: Response) => {
-    try{        
+    try {
         const { texto, idChamado, idUsuario, tipoUsuario } = req.body;
         const chamado = await enviarMensagem(texto, idChamado, idUsuario, tipoUsuario);
         res.json(chamado);
-    }catch(error){
+    } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Erro ao enviar mensagem no chamado'})
+        res.status(500).json({ message: 'Erro ao enviar mensagem no chamado' })
     }
-  })
+})
 
 // Rota para finalizar (cancelar/concluir) chamado
-  router.put('/chamado/finalizarChamado', async (req: Request, res: Response) => {
-    try{        
+router.put('/chamado/finalizarChamado', async (req: Request, res: Response) => {
+    try {
         const { idChamado, idStatus } = req.body;
         const chamado = await finalizarChamado(idChamado, idStatus);
         res.json(chamado);
-    }catch(error){
+    } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Erro ao finalizar chamado'})
+        res.status(500).json({ message: 'Erro ao finalizar chamado' })
     }
-  })
+})
 
   // Rota para criar um chamado
 router.post('/alterarPrioridade', authenticate, authorize(['Cliente']), async (req: Request, res: Response) => {
@@ -334,12 +336,114 @@ router.post('/alterarPrioridade', authenticate, authorize(['Cliente']), async (r
         const { idChamado } = req.body;
         const chamado = await andamentoChamado(idChamado);
         res.json(chamado);
-    }catch(error){
+    } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Erro ao finalizar chamado'})
+        res.status(500).json({ message: 'Erro ao finalizar chamado' })
     }
-  })
- 
+})
+
+//Rota para criar problema e solução
+router.post('/criarProblemas', async (req: Request, res: Response) => {
+    try {
+        const { desc, tema_id, solucao } = req.body;
+        const problema = await enviarProblema(desc, tema_id, solucao);
+        console.log(tema_id)
+        res.json(problema);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao enviar problema e solução.' })
+    }
+})
+
+//Rota para adicionar mais solução
+router.post('/criarSolucoes/:id', async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const { desc } = req.body;
+        const solucao = await enviarSolucao(desc, id);
+        res.json(solucao);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao enviar solução.' })
+    }
+})
+
+//Rota para buscar problema e solução
+router.get('/buscarProblemas', async (req: Request, res: Response) => {
+    try {
+        const problemas = await buscarProblemas();
+        res.json(problemas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao buscar problema e solução.' })
+    }
+})
+
+//Rota para buscar um problema específico
+router.get('/buscarProblema/:id', async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const problemas = await buscarProblema(id);
+        res.json(problemas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao buscar problema e solução.' })
+    }
+})
+
+//Rota para atualizar problema
+router.put('/atualizarProblemas/:id', async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const data = req.body;
+
+        const problemas = await atualizarProblemas(id, data);
+
+        res.json(problemas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao atualizar o problema e solução.' })
+    }
+})
+
+//Rota para atualizar solução
+router.put('/atualizarSolucoes/:id', async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const data = req.body;
+
+        const problemas = await atualizarSolucoes(id, data);
+
+        res.json(problemas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao atualizar a solução.' })
+    }
+})
+
+//Rota para deletar problema e solução
+router.delete('/deletarProblemas/:id', async (req: Request, res: Response) => {
+    try {
+        const id = parseInt(req.params.id);
+        const problemas = await deletarProblemas(id);
+        res.json(problemas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao deletar problema e solução.' })
+    }
+})
+
+//Rota para deletar problema e solução
+router.delete('/deletarSolucoes/:id', async (req: Request, res: Response) => {
+    try {
+        const id = parseInt(req.params.id);
+        const solucao = await deletarSolucoes(id);
+        res.json(solucao);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro ao deletar problema e solução.' })
+    }
+}) 
 
 function atualizarStatusChamado(chamado: any) {
     throw new Error('Function not implemented.');
