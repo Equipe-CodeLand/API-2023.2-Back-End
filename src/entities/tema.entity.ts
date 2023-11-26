@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import Chamado from "./chamado.entity";
+import Problema from "./problema.entity";
 
 @Entity({name: 'tema'})
 export default class Tema {
@@ -15,6 +16,9 @@ export default class Tema {
 
     @OneToMany(() => Chamado, (chamado) => chamado.tema)
     public chamados: Chamado[]
+
+    @OneToMany(() => Problema, (problema) => problema.tema)
+    public problemas: Problema[]
     
     constructor(nome: string) {
         this.nome = nome

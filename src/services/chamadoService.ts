@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { In, getRepository } from "typeorm";
 import { AppDataSource, getChamadoRepository } from "../config/data-source";
 import Chamado from "../entities/chamado.entity";
 import Prioridade from "../entities/prioridade.entity";
@@ -50,6 +50,8 @@ export async function criarChamado(req: Request) {
       console.log(`idTema recebido: ${idTema}`);
       
       let chamado = await chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade));
+      
+      
       enviarMensagem(desc,chamado.id,req.body.userId,'Cliente')
       return chamado
     } catch (error) {
@@ -70,7 +72,7 @@ async function buscarTodosChamados() {
         throw new Error(`Erro ao buscar chamados: ${error.message}`);
     }
 }
-async function buscarChamadosComInformacoes() {
+async function buscarChamadosComInformacoes(tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
     const chamados = await getChamadoRepository().find({
         select:{
             "id":true,
@@ -101,12 +103,20 @@ async function buscarChamadosComInformacoes() {
             status: true,
             prioridade: true,
             tema: true
+        },
+        where: {
+            tema: tema.length > 0 ? { id: In(tema) } : undefined,
+            status: status.length > 0 ? { id: In(status) } : undefined,
+            prioridade: prioridade.length > 0 ? { id: In(prioridade) } : undefined
+        },
+        order: {
+            inicio: 'ASC'
         }
     });
     return chamados;
 }
 
-export async function buscarChamadosAtendente(id: number) {
+export async function buscarChamadosAtendente(id: number,tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
     let atendente = await buscarAtendentePorUserId(id)
     return chamadoRepository.find({
         select:{
@@ -139,12 +149,19 @@ export async function buscarChamadosAtendente(id: number) {
             prioridade: true,
             tema: true
         },
-        where: {atendente: {id: atendente.id}}
+        where: {atendente: {id: atendente.id},
+        tema: tema.length > 0 ? { id: In(tema) } : undefined,
+        status: status.length > 0 ? { id: In(status) } : undefined,
+        prioridade: prioridade.length > 0 ? { id: In(prioridade) } : undefined
+    },
+    order: {
+        inicio: 'ASC'
+    }
     })
 }
 
-export async function buscarChamadosCliente(id: number) {
-    let cliente = await buscarClientePorUserId(id)
+export async function buscarChamadosCliente(id: number,tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
+    let cliente = await buscarClientePorUserId(id)    
     return chamadoRepository.find({
         select:{
             "id":true,
@@ -171,9 +188,34 @@ export async function buscarChamadosCliente(id: number) {
             status: true,
             tema: true
         },
-        where: {cliente: {id: cliente.id}}
+        where: {cliente: {id: cliente.id},
+        tema: tema.length > 0 ? { id: In(tema) } : undefined,
+        status: status.length > 0 ? { id: In(status) } : undefined,
+        prioridade: prioridade.length > 0 ? { id: In(prioridade) } : undefined
+    },
+    order: {
+        inicio: 'ASC'
+    }
     })
 }
+
+//parte do pedro começa aqui
+export async function atualizarPrioridade(chamada: Chamado) {
+    const agora = new Date();
+    const tempoDecorrido = Math.floor((agora.getTime() - chamada.inicio.getTime()) / 60000); // tempo decorrido em minutos
+
+    if (tempoDecorrido >= 3 && chamada.prioridade.id > 1) {
+        chamada.prioridade = await prioridadeRepository.findOneBy({id:1}); // Alta
+    } else if (tempoDecorrido >= 2 && chamada.prioridade.id > 2) {
+        chamada.prioridade = await prioridadeRepository.findOneBy({id:2}); // Média
+    } else if (chamada.prioridade.id > 3) {
+        chamada.prioridade = await prioridadeRepository.findOneBy({id:3}); // Baixa
+    }
+
+    // salvar a chamada atualizada
+    await chamadoRepository.save(chamada);
+}
+//acaba aqui
 
 export async function definirPrioridade(tema: Tema) {
     switch(tema.nome){
@@ -197,7 +239,7 @@ export async function andamentoChamado(idChamado: number) {
     
     chamado.status = status
 
-    await chamadoRepository.save(chamado)
+    await statusRepository.save(chamado)
 
     return chamado
 }
