@@ -50,6 +50,8 @@ export async function criarChamado(req: Request) {
       console.log(`idTema recebido: ${idTema}`);
       
       let chamado = await chamadoRepository.save(new Chamado(tema, desc, cliente, status, prioridade));
+      
+      
       enviarMensagem(desc,chamado.id,req.body.userId,'Cliente')
       return chamado
     } catch (error) {
@@ -159,7 +161,7 @@ export async function buscarChamadosAtendente(id: number,tema:Array<any>,status:
 }
 
 export async function buscarChamadosCliente(id: number,tema:Array<any>,status:Array<any>,prioridade:Array<any>) {
-    let cliente = await buscarClientePorUserId(id)
+    let cliente = await buscarClientePorUserId(id)    
     return chamadoRepository.find({
         select:{
             "id":true,
@@ -197,6 +199,24 @@ export async function buscarChamadosCliente(id: number,tema:Array<any>,status:Ar
     })
 }
 
+//parte do pedro começa aqui
+export async function atualizarPrioridade(chamada: Chamado) {
+    const agora = new Date();
+    const tempoDecorrido = Math.floor((agora.getTime() - chamada.inicio.getTime()) / 60000); // tempo decorrido em minutos
+
+    if (tempoDecorrido >= 3 && chamada.prioridade.id > 1) {
+        chamada.prioridade = await prioridadeRepository.findOneBy({id:1}); // Alta
+    } else if (tempoDecorrido >= 2 && chamada.prioridade.id > 2) {
+        chamada.prioridade = await prioridadeRepository.findOneBy({id:2}); // Média
+    } else if (chamada.prioridade.id > 3) {
+        chamada.prioridade = await prioridadeRepository.findOneBy({id:3}); // Baixa
+    }
+
+    // salvar a chamada atualizada
+    await chamadoRepository.save(chamada);
+}
+//acaba aqui
+
 export async function definirPrioridade(tema: Tema) {
     switch(tema.nome){
         case 'Sem acesso a internet':
@@ -219,7 +239,7 @@ export async function andamentoChamado(idChamado: number) {
     
     chamado.status = status
 
-    await chamadoRepository.save(chamado)
+    await statusRepository.save(chamado)
 
     return chamado
 }
