@@ -24,6 +24,12 @@ create table if not exists prioridade(
     primary key (pri_id)
 );
 
+create table if not exists tema(
+	tema_id int auto_increment,
+    tema_nome varchar(20),
+    primary key (tema_id)
+);
+
 create table if not exists cliente(
 	cli_id int primary key auto_increment,
     user_id int unique, 
@@ -32,14 +38,15 @@ create table if not exists cliente(
 
 create table if not exists chamada(
 	cha_id int primary key auto_increment,
-    cha_tema varchar(30),
+    tema_id int,
     cha_desc varchar(255),
     cha_inicio datetime,
     cha_final datetime,
     cli_id int not null,
     sta_id int not null,
     pri_id int not null,
-    
+
+    foreign key (tema_id) references tema(tema_id),    
     foreign key (sta_id) references stats(sta_id),
     foreign key (pri_id) references prioridade(pri_id),
 	foreign key (cli_id) references cliente(cli_id) ON DELETE CASCADE ON UPDATE CASCADE

@@ -18,17 +18,14 @@ insert into prioridade(pri_nome) values ("Média");
 insert into prioridade(pri_nome) values ("Baixa");
 
 
-select * from usuario;
-
 #Inserts para testar o banco
-insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Felipe','Vieira','123.456.789-01','felipe27092005@gmail.com','(12) 99999-9999','fel123');
-insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Letícia','Helena','643.927.027-10','leticiafatec37@gmail.com','(12) 98888-8888','let123');
-insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Pedro','Souza','384.420.740-11','pedrohenrique@gmail.com','(12) 93657-0275','ped123');
+insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Felipe','Vieira','123.456.789-01','felipe@gmail.com','(12) 99999-9999','fel123');
+insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Letícia','Helena','643.927.027-10','leticia@gmail.com','(12) 98888-8888','let123');
+insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Pedro','Souza','384.420.740-11','pedro@gmail.com','(12) 93657-0275','ped123');
 insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Iago','Cardoso','123.456.549-01','iago@gmail.com','(12) 99347-9486','iago123');
-insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Caio','Rodrigues','643.949.457-10','caio@gmail.com','(12) 98778-8878','caio123');
 insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Luiz Felipe','Santos','384.460.773-11','luiz@gmail.com','(12) 93655-0655','luiz123');
-insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Laura','Gonçalves','204.829.753-18','eulauragabriel@gmail.com','(12) 98643-9753','laura123');
-insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Livia','Faria','493.954.497-15','livia.faria01@fatec.sp.gov.br','(12) 97618-4682','livia123');
+insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Laura','Gonçalves','204.829.753-18','laura@gmail.com','(12) 98643-9753','laura123');
+insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Livia','Faria','493.954.497-15','livia@gmail.com','(12) 97618-4682','livia123');
 insert into usuario(user_nome,user_sobrenome,user_cpf,user_email,user_telefone,user_senha) values ('Admin','Admin','498.956.496-16','admin@admin','(12) 87685-4652','admin');
 
 
@@ -42,8 +39,6 @@ insert into atendente(user_id, ate_turno) values (6,'Vespertino');
 
 insert into administrador(user_id) values (7);
 insert into administrador(user_id) values (8);
-insert into administrador(user_id) values (9);
-
 
 insert into chamada(cha_desc,cha_inicio,cli_id, sta_id, pri_id, tema_id) values (
  "Minha internet anda muito lenta esses dias, não consigo trabalhar",
